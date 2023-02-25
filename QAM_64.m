@@ -5,7 +5,7 @@ function [output] = QAM_64(amplitude, input)
 % amplitude is max amplitude of the signal
 amplitude = abs(amplitude); % little check
 if (not(mod(length(input),6) == 0))
-    input = [input zeros(1, 6 - mod(length(input), 6))]
+    input = [input zeros(1, 6 - mod(length(input), 6))];
 end
 output = zeros(1, length(input)/6); % add zeros at end of transmission if length of input is uneven
 

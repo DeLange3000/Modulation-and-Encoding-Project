@@ -3,7 +3,7 @@ close all
 
 % random bitsstream generator
 bit_stream = [];
-for i = 1:3002
+for i = 1:300
     bit_stream = [bit_stream round(rand())];
 end
 
@@ -25,7 +25,7 @@ else
     plot(real(output), imag(output), '.');
 
 end
-
+Nyquist(output,100)
 real(output)
 imag(output)
 
