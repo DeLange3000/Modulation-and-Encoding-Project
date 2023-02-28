@@ -4,8 +4,9 @@ function [output] = Nyquist_filter(input, rate)
     oversampled = zeros(1, rate*length(input));
     fc = 1e6;
     for i = 1:length(input)
-        oversampled(rate*(i-1)+1:rate*i) =  real(input(i)*exp(j*2*pi*fc*(0:1/(rate*fc):(rate-1)/(rate*fc))));
+        oversampled(rate*(i-1)+1:rate*i) = real(input(i)*exp(j*2*pi*fc*(0:1/(rate*fc):(rate-1)/(rate*fc))));
     end
+    
 
     t = 1/(rate*fc):1/(rate*fc):(length(oversampled))/(rate*fc);
     figure
@@ -59,7 +60,7 @@ function [output] = Nyquist_filter(input, rate)
     title('frequency domain signal (filtered)')
     xlabel('Frequency (Hz)')
     ylabel('Amplitude')
-    legend('unfiltered signal', 'filtered signal')
+    legendt('unfiltered signal', 'filtered signal')
     
     figure
     plot(t, filtered)

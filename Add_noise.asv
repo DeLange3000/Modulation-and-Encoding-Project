@@ -1,0 +1,16 @@
+function [output] = Add_noise(input)
+
+% additive white gaussian noise
+% has real and imaginairy part that are independent from each other
+  
+N0 = 10; %noise power
+Yn1 = N0/2; %power spectral density real noise
+Yn2 = Yn1; %power spectral density imaginairy noise
+
+n1 = randn(1,length(input));
+n2 = randn(1,length(input));
+
+
+en = n1 - j*n2;
+output = input + en;
+end
