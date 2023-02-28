@@ -1,4 +1,4 @@
-function output = Nyquist(input, rate)
+function [output] = Nyquist_filter(input, rate)
     % input: complex symbols from modulation
     % oversampling: 1M symbols/s -> in Matlab: use 10 samples per symbol
     oversampled = zeros(1, rate*length(input));
@@ -9,15 +9,22 @@ function output = Nyquist(input, rate)
     
 
     t = 1/(rate*fc):1/(rate*fc):(length(oversampled))/(rate*fc);
+    figure
     plot(t, oversampled)
+    title('time domain signal (not filtered)')
+    xlabel('Time (s)')
+    ylabel('Amplitude')
 
 
     f_oversampled = (fft(oversampled, length(oversampled)));
     f_axis = 0:rate*fc/length(f_oversampled):rate*fc-rate*fc/length(f_oversampled);
     figure
     plot(f_axis, abs(f_oversampled))
+    title('frequency domain signal (not filtered)')
+    xlabel('Frequency (Hz)')
+    ylabel('Amplitude')
 
-    filter = ones(1, length(f_oversampled)/2);
+    
     % filtering
     beta = 0.3;
 
@@ -27,8 +34,8 @@ function output = Nyquist(input, rate)
     % sqrt(0.5*(1+cos(pi/(beta*fc) * (f - (1-beta)fc/2))) for frequencies
     % inbetween
 
-    
-
+    % building the filter: first make one half, then mirror it
+    filter = ones(1, length(f_oversampled)/2);
     for i = 1:length(f_axis)/2
         if f_axis(i) > (1+beta)*fc/2
             % set to zero
@@ -38,19 +45,29 @@ function output = Nyquist(input, rate)
             filter(i) = sqrt(0.5*(1+cos(pi/(beta*fc) * (f_axis(i) - (1-beta)*fc/2))));
         end
     end
-    filter = [filter fliplr(filter)];
+
+    % some tweaking for symmetry
+    filter = [1 filter(1:end-1) fliplr(filter)];
     
     f_filtered = f_oversampled .* filter;
     filtered = (ifft(f_filtered, length(oversampled)));
 
     figure
-    plot((abs(f_oversampled)))
+    plot(fftshift(abs(f_oversampled)))
     hold on
     plot(abs(fftshift(f_filtered)))
-    stem(fftshift(filter))
+    plot(fftshift(filter))
+    title('frequency domain signal (filtered)')
+    xlabel('Frequency (Hz)')
+    ylabel('Amplitude')
     
     figure
     plot(t, filtered)
+    title('time domain signal (filtered)')
+    xlabel('Time (s)')
+    ylabel('Amplitude')
+
+    output = filtered;
     
 
 end

@@ -32,7 +32,7 @@ end
 
 filtered_signal = Nyquist_filter(output,100)
 
-noisy_signal = Add_noise(filtered_signal)
+noisy_singal = Add
 
 
 
