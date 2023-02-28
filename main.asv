@@ -4,9 +4,9 @@ clear
 
 %% inputs
 
-Eb_N0_ratio = 2; % noise power Eb/N0
+Eb_N0_ratio = 100; % noise power Eb/N0
 
-bitstream_length = 4*100; %length of bitstream
+bitstream_length = 4*; %length of bitstream
 
 % modulations possible:
 %   pam 1
