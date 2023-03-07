@@ -4,7 +4,7 @@ clear
 
 %% input parameters
 
-Eb_N0_ratio = 10; % noise power Eb/N0
+Eb_N0_ratio = 0.01; % noise power Eb/N0
 
 bitstream_length = 6*4; %length of bitstream
 
@@ -14,8 +14,8 @@ bitstream_length = 6*4; %length of bitstream
 %   qam 4
 %   qam 6
 
-modulation = 'qam'; % pam or qam
-number_of_bits = 6; % number of bits per symbol
+modulation = 'pam'; % pam or qam
+number_of_bits = 2; % number of bits per symbol
 
 upsampling_rate = 100; %rate of upsamping
 Fs = 2e6; % symbol frequency rate

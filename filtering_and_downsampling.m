@@ -17,7 +17,7 @@ function [output] = filtering_and_downsampling(input,rate, f_filter)
     figure
     hold on
     plot(t , real(ifft(f_filtered)))
-    plot(t , imag(ifft(f_filtered)))
+    %plot(t , imag(ifft(f_filtered)))
     title('time domain signal (filtered at receiver)')
     xlabel('Time (s)')
     ylabel('Amplitude')
