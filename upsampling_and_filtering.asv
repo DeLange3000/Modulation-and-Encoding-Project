@@ -27,7 +27,11 @@ function [output] = upsampling_and_filtering(input, rate, f_filter)
     xlabel('Frequency (Hz)')
     ylabel('Amplitude')
 
-    f_filtered = f_oversampled.*f_filter;
+    for i = 1:length(input)
+        f_sample = fft(oversampled((i-1)*100 + 1:i*100))
+        f_filtered_sample = f_filter(rate:2)
+
+    f_filtered = zeros(length(f_axis), 1);
 
 
     figure
@@ -39,7 +43,7 @@ function [output] = upsampling_and_filtering(input, rate, f_filter)
     ylabel('Amplitude')
     
     figure
-    plot(t, real(fftshift(ifft(f_filtered))))
+    plot(t, real(ifft(f_filtered)))
     %plot(0:T/rate:length(f_filtered)*T/rate - T/rate, abs(ifft(f_filtered)))
     title('time domain signal (filtered)')
     xlabel('Time (s)')

@@ -1,4 +1,4 @@
-function [output] = filtering_and_downsampling(input,rate)
+function [output] = filtering_and_downsampling(input,rate, f_filter)
 
     fc = 1e6;
     fs = 2e6; %symbol rate
@@ -9,13 +9,8 @@ function [output] = filtering_and_downsampling(input,rate)
     t = 1/(rate*fs):1/(rate*fs):(length(input))/(rate*fs);
    
 
-%     h = rcosdesign(0.3,1,100, "sqrt");
-%     filtered = upfirdn(input, h, 1, rate);
 
-    f_filtered = zeros(length(f_axis), 1);
-    for i = 1:length(f_axis)
-        f_filtered(i) = Nyquist_filter(f_input(i), f_axis(i), rate);
-    end
+    f_filtered = f_input.*f_filter;
 
 
     %plotting
@@ -26,7 +21,7 @@ function [output] = filtering_and_downsampling(input,rate)
     ylabel('Amplitude')
 
 filtered = ifft(f_filtered)
-output = zeros(1, 1:length(filtered)/100);
+output = zeros(1, length(filtered)/100);
 output(1) = filtered(1);
 for i =100:100:length(filtered)
     output(i/100) = filtered(i);

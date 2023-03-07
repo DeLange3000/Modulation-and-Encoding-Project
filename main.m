@@ -19,6 +19,7 @@ number_of_bits = 4; % number of bits per symbol
 
 upsampling_rate = 100; %rate of upsamping
 Fs = 2e6; % symbol frequency rate
+beta = 0.3;
 
 %% checking compatibility
 if (not(mod(bitstream_length/number_of_bits,1) == 0))
@@ -61,9 +62,14 @@ ylabel('Imaginairy axis')
 set(gca, 'XAxisLocation', 'origin')
 set(gca, 'YAxisLocation', 'origin')
 
+%% creating filter
+
+f_filter = Nyquist_filter(Fs, upsampling_rate, length(encoded_signal), beta);
+f_filter = sqrt(f_filter); %make it root
+
 %% upsample and filter signal
 
-filtered_signal = upsampling_and_filtering(encoded_signal, upsampling_rate);
+filtered_signal = upsampling_and_filtering(encoded_signal, upsampling_rate, f_filter);
 
 %% add noise
 
@@ -71,7 +77,7 @@ noisy_signal = Add_noise(filtered_signal, Eb_N0_ratio, number_of_bits, upsamplin
 
 %% inverse nyquist filter and downsamping
 
-filtered_signal_receiver = filtering_and_downsampling(noisy_signal, upsampling_rate);
+filtered_signal_receiver = filtering_and_downsampling(noisy_signal, upsampling_rate, f_filter);
 figure
 plot(real(filtered_signal_receiver), imag(filtered_signal_receiver), '*')
 title('downsampled received signal')
@@ -83,7 +89,7 @@ set(gca, 'YAxisLocation', 'origin')
 
 %% decode
 
-decoded = demapping(filtered_signal_receiver, number_of_bits, modulation);
+decoded = demapping(filtered_signal_receiver', number_of_bits, modulation);
 
 %% checking BER
 
