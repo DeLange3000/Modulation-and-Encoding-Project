@@ -8,7 +8,10 @@ function [output] = filtering_and_downsampling(input,rate, f_filter)
     f_axis = 0:rate*fs/length(input):rate*fs-rate*fs/length(f_input);
     t = 1/(rate*fs):1/(rate*fs):(length(input))/(rate*fs);
    
+
+
     f_filtered = f_input.*f_filter;
+
 
     %plotting
     figure
@@ -18,16 +21,9 @@ function [output] = filtering_and_downsampling(input,rate, f_filter)
     ylabel('Amplitude')
 
 filtered = ifft(f_filtered);
+output = zeros(length(filtered)/100, 1);
+output(1) = filtered(1);
+for i =100:100:length(filtered)
+    output(i/100) = filtered(i);
 
-output = [];
-for i =1:rate:length(filtered)
-    output = [output filtered(i)]
 end
-output = output';
-
-% output = zeros(length(filtered)/100, 1);
-% output(1) = filtered(1);
-% for i =100:100:length(filtered)
-%     output(i/100) = filtered(i+1);
-% 
-% end

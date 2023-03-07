@@ -14,10 +14,10 @@ function [output] = Nyquist_filter(fs, rate, sample_length, beta)
     f_filter_response = zeros(1, length(f_axis));
     for i = 1:length(f_filter_response)
         if abs(f_axis(i)) <= (1-beta)/(2*T)
-            f_filter_response(i) = 1;
+            f_filter_response(i) = 2;
         elseif abs(f_axis(i)) > (1-beta)/(2*T) && abs(f_axis(i)) <= (1+ beta)/(2*T)
 
-             f_filter_response(i) = (1*0.5*(1+cos(pi*T/beta * (abs(f_axis(i)) - (1-beta)/(2*T)))));
+             f_filter_response(i) = (2*0.5*(1+cos(pi*T/beta * (abs(f_axis(i)) - (1-beta)/(2*T)))));
         else
              f_filter_response(i) = 0;
         end   
@@ -31,12 +31,23 @@ function [output] = Nyquist_filter(fs, rate, sample_length, beta)
     ylabel('Amplitude')
     title('Nyquist filter in frequency domain')
 
-    output = f_filter_response
-
-%     t = -T:T/rate:T - T/rate;
+    filter_response = fftshift(ifft(fftshift(output)));
+    
+%     t = -T*sample_length:T/rate:T*sample_length - T/rate;
 %     figure
-%     filter_response = ifft(fftshift(output));
-%     plot(t , filter_response)
+
+%     impulse = zeros(1, length(filter_response));
+%     impulse(length(t)/2) = 1;
+%     plot(t , conv(impulse,filter_response, 'same'))
+%     xlabel('Time (s)')
+%     ylabel('amplitude')
+
+    figure
+    impz(filter_response)
+
+    output = f_filter_response';
+
+    
    
 end
 

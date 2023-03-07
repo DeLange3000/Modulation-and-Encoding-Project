@@ -14,8 +14,8 @@ bitstream_length = 4*4; %length of bitstream
 %   qam 4
 %   qam 6
 
-modulation = 'qam'; % pam or qam
-number_of_bits = 4; % number of bits per symbol
+modulation = 'pam'; % pam or qam
+number_of_bits = 2; % number of bits per symbol
 
 upsampling_rate = 100; %rate of upsamping
 Fs = 2e6; % symbol frequency rate
@@ -89,7 +89,7 @@ set(gca, 'YAxisLocation', 'origin')
 
 %% decode
 
-decoded = demapping(filtered_signal_receiver', number_of_bits, modulation);
+decoded = demapping(filtered_signal_receiver, number_of_bits, modulation);
 
 %% checking BER
 
