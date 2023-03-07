@@ -2,11 +2,11 @@ clc;
 close all
 clear
 
-%% input parameters
+%% inputs
 
 Eb_N0_ratio = 10; % noise power Eb/N0
 
-bitstream_length = 6*4; %length of bitstream
+bitstream_length = 4*4; %length of bitstream
 
 % modulations possible:
 %   pam 1
@@ -15,7 +15,7 @@ bitstream_length = 6*4; %length of bitstream
 %   qam 6
 
 modulation = 'qam'; % pam or qam
-number_of_bits = 6; % number of bits per symbol
+number_of_bits = 4; % number of bits per symbol
 
 upsampling_rate = 100; %rate of upsamping
 Fs = 2e6; % symbol frequency rate
@@ -78,7 +78,6 @@ noisy_signal = Add_noise(filtered_signal, Eb_N0_ratio, number_of_bits, upsamplin
 %% inverse nyquist filter and downsamping
 
 filtered_signal_receiver = filtering_and_downsampling(noisy_signal, upsampling_rate, f_filter);
-
 figure
 plot(real(filtered_signal_receiver), imag(filtered_signal_receiver), '*')
 title('downsampled received signal')
@@ -90,6 +89,7 @@ set(gca, 'YAxisLocation', 'origin')
 
 %% decode
 
+filter
 decoded = demapping(filtered_signal_receiver, number_of_bits, modulation);
 
 %% checking BER
