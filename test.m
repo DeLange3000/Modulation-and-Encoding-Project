@@ -1,18 +1,23 @@
+clear
+close all
+clc
 
+fs = 2e6
+T = 1/fs
 
-filter = comm.RaisedCosineTransmitFilter(...
-  'Shape',                  'Normal', ...
-  'RolloffFactor',          0.3, ...
-  'FilterSpanInSymbols',    1, ...
-  'OutputSamplesPerSymbol', 100);
+f_signal = zeros(1, 1000);
+f_signal(1) = 1;
+f = 0:fs/1000:fs-fs/1000;
 
-a = filter.coeffs()
+f_filtered_signal = zeros(1, length(f));
+for i = 1:length(f)
+    f_filtered_signal(i) = Nyquist_filter(f_signal(i), f(i), 100);
+end
 
-filter2 = rcosdesign(0.3, 10, 100, 'sqrt');
-
-output = upfirdn(encoded_signal, filter2, 100);
+plot(real(ifft(f_filtered_signal)))
 
 figure
-plot(abs(output))
-figure
-plot(abs(fft(output)))
+plot(f, abs(f_filtered_signal))
+
+
+

@@ -4,9 +4,9 @@ clear
 
 %% inputs
 
-Eb_N0_ratio = 2; % noise power Eb/N0
+Eb_N0_ratio = 10; % noise power Eb/N0
 
-bitstream_length = 4*100; %length of bitstream
+bitstream_length = 4*4; %length of bitstream
 
 % modulations possible:
 %   pam 1
@@ -67,7 +67,7 @@ filtered_signal = upsampling_and_filtering(encoded_signal, upsampling_rate);
 
 %% add noise
 
-noisy_signal = Add_noise(filtered_signal, Eb_N0_ratio, 2^number_of_bits, upsampling_rate);
+noisy_signal = Add_noise(filtered_signal, Eb_N0_ratio, number_of_bits, upsampling_rate);
 
 %% inverse nyquist filter and downsamping
 
