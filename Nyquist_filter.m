@@ -26,6 +26,7 @@ function [output] = Nyquist_filter(input, rate)
     
     % filtering
     beta = 0.3;
+    fc = 2e6;
 
     % freq resp of filter:
     % 1 for frequencies up to (1-beta)fc/2
@@ -41,16 +42,27 @@ function [output] = Nyquist_filter(input, rate)
             filter(i) = 0;
         elseif f_axis(i) > (1-beta)*fc/2
 
-            filter(i) = sqrt(0.5*(1+cos(pi/(beta*fc) * (f_axis(i) - (1-beta)*fc/2))));
+            filter(i) = (0.5*(1+cos(pi/(beta*fc) * (f_axis(i) - (1-beta)*fc/2))));
         end
     end
 
     % some tweaking for symmetry
     filter = [1 filter(1:end-1) fliplr(filter)];
-    
-    f_filtered = f_oversampled .* filter;
-    filtered = (ifft(f_filtered, length(oversampled)));
+    figure
+    subplot(221)
+    plot(f_axis, filter)
+    title("frequency resp")
+    subplot(222)
+    plot(t, ifftshift(ifft(filter)))
+    title("impulse response")
+    subplot(223)
+    title("")
 
+
+    %f_filtered = f_oversampled .* filter;
+    %filtered = (ifft(f_filtered, length(oversampled)));
+
+    f
     figure
     plot(fftshift(abs(f_oversampled)))
     hold on
