@@ -1,5 +1,5 @@
 function [output] = Nyquist_filter(fs, rate, sample_length, beta)
-
+    
     %% filter parameters
     fc = fs/2;
     T = 1/fs;
@@ -25,12 +25,8 @@ function [output] = Nyquist_filter(fs, rate, sample_length, beta)
         end   
     end
     
-    %% plot filter in frequency domain  
+    %% plot filter in frequency domain
 
-
-    %f_filtered = f_oversampled .* filter;
-    %filtered = (ifft(f_filtered, length(oversampled)));
-    
     figure
     plot(f_axis, f_filter_response)
     xlabel('Frequency (Hz)')
@@ -43,14 +39,14 @@ function [output] = Nyquist_filter(fs, rate, sample_length, beta)
     figure
     impz(filter_response)
 
-    % t = -T*sample_length:T/rate:T*sample_length - T/rate;
-    % figure
+    %t = -T*sample_length:T/rate:T*sample_length - T/rate;
+    %figure
 
-    % impulse = zeros(1, length(filter_response));
-    % impulse(length(t)/2) = 1;
-    % plot(t , conv(impulse,filter_response, 'same'))
-    % xlabel('Time (s)')
-    % ylabel('amplitude')
+%     impulse = zeros(1, length(filter_response));
+%     impulse(length(t)/2) = 1;
+%     plot(t , conv(impulse,filter_response, 'same'))
+%     xlabel('Time (s)')
+%     ylabel('amplitude')
 
     %% return positive frequencies of filter
 
