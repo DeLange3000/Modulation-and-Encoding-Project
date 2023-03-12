@@ -16,10 +16,10 @@ function [output] = Nyquist_filter(fs, rate, sample_length, beta)
     f_filter_response = zeros(1, length(f_axis));
     for i = 1:length(f_filter_response)
         if abs(f_axis(i)) <= (1-beta)/(2*T)
-            f_filter_response(i) = 2;
+            f_filter_response(i) = 1/(T*fc);
         elseif abs(f_axis(i)) > (1-beta)/(2*T) && abs(f_axis(i)) <= (1+ beta)/(2*T)
 
-             f_filter_response(i) = (2*0.5*(1+cos(pi*T/beta * (abs(f_axis(i)) - (1-beta)/(2*T)))));
+             f_filter_response(i) = (1/(T*fc)*0.5*(1+cos(pi*T/beta * (abs(f_axis(i)) - (1-beta)/(2*T)))));
         else
              f_filter_response(i) = 0;
         end   
