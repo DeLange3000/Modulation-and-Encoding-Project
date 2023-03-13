@@ -15,11 +15,11 @@ Es = 0;
 for i =1:length(input)
     Es = abs(input(i))^2;
 end
-Es
-Eb = Es*Tsample/(2*M)
+Es;
+Eb = Es*Tsample/(2*M);
 
-N0 = Eb/Eb_N0_ratio %N0 is power spectral density
-noise_power = N0*band_width % bandwidth is equal to samplingrate
+N0 = Eb/Eb_N0_ratio; %N0 is power spectral density
+noise_power = N0*band_width; % bandwidth is equal to samplingrate
 
 
 %% add noise to output
@@ -28,12 +28,12 @@ en = randn(length(input), 1)*sqrt(noise_power) - j*randn(length(input), 1)*sqrt(
 output = input + en;
 
 %% plot signal with noise in time domain
-
-figure
-hold on
-plot(0:T/rate:length(output)*T/rate - T/rate, real(fftshift(output)))
-%plot(0:T/rate:length(output)*T/rate - T/rate, imag(fftshift(output)))
-title('noisy signal')
-xlabel('Time (s)')
-ylabel('Amplitude')
+% 
+% figure
+% hold on
+% plot(0:T/rate:length(output)*T/rate - T/rate, real(fftshift(output)))
+% %plot(0:T/rate:length(output)*T/rate - T/rate, imag(fftshift(output)))
+% title('noisy signal')
+% xlabel('Time (s)')
+% ylabel('Amplitude')
 end

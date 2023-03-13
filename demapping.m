@@ -19,7 +19,7 @@ switch modulation,
         int_rx = sigma * symb_rx + (2^Nbps-1)/2;
 
         % Integer detection
-        int_det = round(int_rx);
+        int_det = round(real(int_rx));
         int_det(find(int_det<0)) = 0;
         int_det(find(int_det>2^Nbps-1)) = 2^Nbps-1;
 
