@@ -4,7 +4,8 @@ clear
 
 %% input parameters
 
-Eb_N0_ratios_dB = -5:1:20;
+
+Eb_N0_ratios_dB = 0:2:10; % 0:1:0;
 
 Eb_N0_ratio_dB = 0;
 
@@ -12,7 +13,7 @@ Eb_N0_ratio = 10^(Eb_N0_ratio_dB/10); % noise power Eb/N0
 
 Eb_N0_ratios = 10.^(Eb_N0_ratios_dB/10);
 
-bitstream_length = 1000000*4; %length of bitstream
+bitstream_length = 10000000*2; %length of bitstream
 
 % modulations possible:
 %   pam 1
@@ -21,7 +22,7 @@ bitstream_length = 1000000*4; %length of bitstream
 %   qam 6
 
 modulation = 'qam'; % pam or qam
-number_of_bits = 16; % number of bits per symbol
+number_of_bits = 4; % number of bits per symbol
 
 upsampling_rate = 2; %rate of upsamping
 Fs = 2e6; % symbol frequency rate
@@ -91,10 +92,11 @@ fprintf("Adding noise...\n")
 
 noisy_signal = Add_noise(filtered_signal, Eb_N0_ratio, number_of_bits, upsampling_rate);
 
-noisy_signals = [];
+noisy_signals = zeros(length(filtered_signal), length(Eb_N0_ratios));
 for i = 1:length(Eb_N0_ratios)
     fprintf("("+i+")\n")
-    noisy_signals = [noisy_signals Add_noise(filtered_signal, Eb_N0_ratios(i), number_of_bits, upsampling_rate)];
+    
+    noisy_signals(:, i) = Add_noise(filtered_signal, Eb_N0_ratios(i), number_of_bits, upsampling_rate);
 end
 
 %% inverse nyquist filter and downsamping
@@ -103,18 +105,18 @@ fprintf("Filtering & downsampling...\n")
 
 filtered_signal_receiver = filtering_and_downsampling(noisy_signal, upsampling_rate, f_filter);
 
-% figure
-% plot(real(filtered_signal_receiver), imag(filtered_signal_receiver), '*')
-% title('downsampled received signal')
-% xlabel('Real axis')
-% ylabel('Imaginairy axis')
-% set(gca, 'XAxisLocation', 'origin')
-% set(gca, 'YAxisLocation', 'origin')
+figure
+plot(real(filtered_signal_receiver), imag(filtered_signal_receiver), '*')
+title('downsampled received signal')
+xlabel('Real axis')
+ylabel('Imaginairy axis')
+set(gca, 'XAxisLocation', 'origin')
+set(gca, 'YAxisLocation', 'origin')
 
-filtered_signals_receiver = [];
+filtered_signals_receiver = zeros(length(encoded_signal), length(Eb_N0_ratios));
 for i = 1:length(Eb_N0_ratios)
     fprintf("("+i+")\n")
-    filtered_signals_receiver = [filtered_signals_receiver filtering_and_downsampling(noisy_signals(:,i), upsampling_rate, f_filter)];
+    filtered_signals_receiver(:, i) = filtering_and_downsampling(noisy_signals(:,i), upsampling_rate, f_filter);
 end
 
 
@@ -122,34 +124,34 @@ end
 
 fprintf("Decoding...\n")
 
-decoded = demapping(filtered_signal_receiver, number_of_bits, modulation);
+%decoded = demapping(filtered_signal_receiver, number_of_bits, modulation);
 
-decodeds = [];
+decodeds = zeros(length(bit_stream), length(Eb_N0_ratios));
 for i = 1:length(Eb_N0_ratios)
     fprintf("("+i+")\n")
-    decodeds = [decodeds demapping(filtered_signals_receiver(:,i), number_of_bits, modulation)];
+    decodeds(:, i) = demapping(filtered_signals_receiver(:,i), number_of_bits, modulation);
 end
 
 %% checking BER
 
 fprintf("Calculating BER...\n")
     
-ERR = 0;
-for i = 1:length(decoded)
-    if (not(decoded(i) == bit_stream(i)))
-        ERR = ERR + 1;
-    end
-end
-
-BER = ERR/length(decoded);
+% ERR = 0;
+% for i = 1:length(decoded)
+%     if (not(decoded(i) == bit_stream(i)))
+%         ERR = ERR + 1;
+%     end
+% end
+% 
+% BER = ERR/length(decoded);
 
 ERRs = zeros(length(Eb_N0_ratios), 1);
 BERs = zeros(length(Eb_N0_ratios), 1);
 for i = 1:length(Eb_N0_ratios)
     fprintf("("+i+")\n")
     dec = decodeds(:,i);
-    for j = 1:length(dec)
-        if (dec(j) ~= bit_stream(j))
+    for a = 1:length(dec)
+        if (dec(a) ~= bit_stream(a))
             ERRs(i) = ERRs(i) + 1;
         end
     end
@@ -160,8 +162,6 @@ figure
 semilogy(10*log10(Eb_N0_ratios), BERs)
 xlabel("Eb/N0 [dB]")
 ylabel("BER")
-
-
 
 
 

@@ -25,9 +25,15 @@ function [output] = filtering_and_downsampling(input,rate, f_filter)
     %% downsample
 
     filtered = (ifft(f_filtered));
-    
-    output = [];
+
+%     output = [];
+%     for i =1:rate:length(filtered)
+%         output = [output; filtered(i)];
+%     end
+
+    output = zeros(length(filtered)/rate, 1);
+    a = 1;
     for i =1:rate:length(filtered)
-        output = [output; filtered(i)];
+        output(a) = filtered(i);
+        a = a + 1;
     end
-    output = output;

@@ -13,7 +13,7 @@ Tsample = 1/band_width;
 
 Es = 0;
 for i =1:length(input)
-    Es = abs(input(i))^2;
+    Es = real(input(i))^2 + imag(input(i))^2;
 end
 Es;
 Eb = Es*Tsample/(2*M);
@@ -24,7 +24,7 @@ noise_power = N0*band_width; % bandwidth is equal to samplingrate
 
 %% add noise to output
 
-en = randn(length(input), 1)*sqrt(noise_power) - j*randn(length(input), 1)*sqrt(noise_power);
+en = randn(length(input), 1)*sqrt(noise_power) + j*randn(length(input), 1)*sqrt(noise_power);
 output = input + en;
 
 %% plot signal with noise in time domain
