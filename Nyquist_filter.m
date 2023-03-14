@@ -12,7 +12,7 @@ function [output] = Nyquist_filter(fs, rate, sample_length, beta)
     % sqrt(0.5*(1+cos(pi/(beta*fc) * (f - (1-beta)fc/2))) for frequencies
     % inbetween
 
-    f_axis = -fs:fs/(sample_length*rate):fs - fs/(rate*sample_length);
+    f_axis = -fs:fs*2/(sample_length*rate):fs - fs/(rate*sample_length);
     f_filter_response = zeros(1, length(f_axis));
     for i = 1:length(f_filter_response)
         if abs(f_axis(i)) <= (1-beta)/(2*T)
@@ -41,7 +41,8 @@ function [output] = Nyquist_filter(fs, rate, sample_length, beta)
 
     %% return positive frequencies of filter
 
-    output = f_filter_response(length(f_filter_response)/2 + 1:length(f_filter_response))';
+    %output = f_filter_response(length(f_filter_response)/2 + 1:length(f_filter_response))';
+    output = f_filter_response';
 
 end
 

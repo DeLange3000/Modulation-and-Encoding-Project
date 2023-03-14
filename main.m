@@ -5,7 +5,7 @@ clear
 %% input parameters
 
 
-Eb_N0_ratios_dB = 0:2:10; % 0:1:0;
+Eb_N0_ratios_dB = 0:0.5:5; % 0:1:0;
 
 Eb_N0_ratio_dB = 0;
 
@@ -13,7 +13,7 @@ Eb_N0_ratio = 10^(Eb_N0_ratio_dB/10); % noise power Eb/N0
 
 Eb_N0_ratios = 10.^(Eb_N0_ratios_dB/10);
 
-bitstream_length = 10000000*2; %length of bitstream
+bitstream_length = 10000000*6; %length of bitstream
 
 % modulations possible:
 %   pam 1
@@ -21,8 +21,8 @@ bitstream_length = 10000000*2; %length of bitstream
 %   qam 4
 %   qam 6
 
-modulation = 'qam'; % pam or qam
-number_of_bits = 4; % number of bits per symbol
+modulation = 'pam'; % pam or qam
+number_of_bits = 2; % number of bits per symbol
 
 upsampling_rate = 2; %rate of upsamping
 Fs = 2e6; % symbol frequency rate
