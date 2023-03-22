@@ -39,7 +39,7 @@ end
 
 fprintf("Generating bitstream...\n")
 
-bit_stream = zeros(bitstream_length, 1);
+bit_stream = zeros(1, bitstream_length);
 for i = 1:bitstream_length
     bit_stream(i) = round(rand());
 end
@@ -48,12 +48,27 @@ end
 
 fprintf("Encoding...\n")
 
-H = makeLdpc(5, 10, 0, 0, 2);
+H = [ 1 1 0 1 1 0 0 1 0 0;
+      0 1 1 0 1 1 1 0 0 0;
+      0 0 0 1 0 0 0 1 1 1;
+      1 1 0 0 0 1 1 0 1 0;
+      0 0 1 0 0 1 0 1 0 1 ];
+
+mat = mod(rref(H),2)
+I = mat(:,1:5);
+P = mat(:, 6:10)'
+G = [P I]
+
 
 encoded_bitstream = [];
-for i = 1:5:bitstream_length-5
+for i = 1:5:bitstream_length
     block = bit_stream(i:i+4);
-    encoded = mod(block'*H, 2);
-    encoded_bitstream = encoded';
+    encoded = mod(block*H, 2);
+    encoded_bitstream = [encoded_bitstream encoded];
 end
+bit_stream;
+encoded_bitstream;
+bitstream_length;
+
+
 
