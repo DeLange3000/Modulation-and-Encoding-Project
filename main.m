@@ -7,13 +7,14 @@ clear
 
 Eb_N0_ratios_dB = 0:2:30; % 0:1:0;
 
+
 Eb_N0_ratio_dB = 0;
 
 Eb_N0_ratio = 10^(Eb_N0_ratio_dB/10); % noise power Eb/N0
 
 Eb_N0_ratios = 10.^(Eb_N0_ratios_dB/10);
 
-bitstream_length = 10000000*6; %length of bitstream
+bitstream_length = 100000*4; %length of bitstream
 
 % modulations possible:
 %   pam 1
@@ -24,9 +25,10 @@ bitstream_length = 10000000*6; %length of bitstream
 modulation = 'qam'; % pam or qam
 number_of_bits = 6; % number of bits per symbol
 
-upsampling_rate = 2; %rate of upsamping
+upsampling_rate = 4; %rate of upsamping
 Fs = 2e6; % symbol frequency rate
 beta = 0.3;
+filter_taps = 51;
 
 %% checking compatibility
 if (not(mod(bitstream_length/number_of_bits,1) == 0))
@@ -77,14 +79,13 @@ end
 
 fprintf("Creating filter...\n")
 
-f_filter = Nyquist_filter(Fs, upsampling_rate, length(encoded_signal), beta);
-f_filter = sqrt(f_filter); %make it root
+filter = Nyquist_filter(Fs, upsampling_rate, length(encoded_signal), beta, filter_taps);
 
 %% upsample and filter signal
 
 fprintf("Upsampling & filtering...\n")
 
-filtered_signal = upsampling_and_filtering(encoded_signal, upsampling_rate, f_filter);
+filtered_signal = upsampling_and_filtering(encoded_signal, upsampling_rate, filter);
 
 %% add noise
 
@@ -103,20 +104,20 @@ end
 
 fprintf("Filtering & downsampling...\n")
 
-filtered_signal_receiver = filtering_and_downsampling(noisy_signal, upsampling_rate, f_filter);
+filtered_signal_receiver = filtering_and_downsampling(noisy_signal, upsampling_rate, filter);
 
-figure
-plot(real(filtered_signal_receiver), imag(filtered_signal_receiver), '*')
-title('downsampled received signal')
-xlabel('Real axis')
-ylabel('Imaginairy axis')
-set(gca, 'XAxisLocation', 'origin')
-set(gca, 'YAxisLocation', 'origin')
+% figure
+% plot(real(filtered_signal_receiver), imag(filtered_signal_receiver), '*')
+% title('downsampled received signal')
+% xlabel('Real axis')
+% ylabel('Imaginairy axis')
+% set(gca, 'XAxisLocation', 'origin')
+% set(gca, 'YAxisLocation', 'origin')
 
 filtered_signals_receiver = zeros(length(encoded_signal), length(Eb_N0_ratios));
 for i = 1:length(Eb_N0_ratios)
     fprintf("("+i+")\n")
-    filtered_signals_receiver(:, i) = filtering_and_downsampling(noisy_signals(:,i), upsampling_rate, f_filter);
+    filtered_signals_receiver(:, i) = filtering_and_downsampling(noisy_signals(:,i), upsampling_rate, filter);
 end
 
 

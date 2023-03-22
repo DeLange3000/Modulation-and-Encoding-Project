@@ -1,4 +1,4 @@
-function [output] = filtering_and_downsampling(input,rate, f_filter)
+function [output] = filtering_and_downsampling(input,rate, filter)
 
     fc = 1e6;
     fs = 2e6; %symbol rate
@@ -6,25 +6,21 @@ function [output] = filtering_and_downsampling(input,rate, f_filter)
 
     %% filter received signal
 
-    f_input = (fft(input));
-    f_axis = 0:rate*fs/length(input):rate*fs-rate*fs/length(f_input);
     t = 1/(rate*fs):1/(rate*fs):(length(input))/(rate*fs);
    
-    f_filtered = f_input.*f_filter;
+    filtered = conv(input, filter, 'same');
 
     %% plot filtered signal
 
 %     figure
 %     hold on
-%     plot(t , real(ifft(f_filtered)))
+%     plot(t , real(filtered))
 %     %plot(t , imag(ifft(f_filtered)))
 %     title('time domain signal (filtered at receiver)')
 %     xlabel('Time (s)')
 %     ylabel('Amplitude')
 
     %% downsample
-
-    filtered = (ifft(f_filtered));
 
 %     output = [];
 %     for i =1:rate:length(filtered)
