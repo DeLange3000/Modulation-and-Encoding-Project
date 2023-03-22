@@ -5,7 +5,8 @@ clear
 %% input parameters
 
 
-Eb_N0_ratios_dB = 0:2:18; % 0:1:0;
+Eb_N0_ratios_dB = 0:2:30; % 0:1:0;
+
 
 Eb_N0_ratio_dB = 0;
 
@@ -22,7 +23,7 @@ bitstream_length = 100000*4; %length of bitstream
 %   qam 6
 
 modulation = 'qam'; % pam or qam
-number_of_bits = 4; % number of bits per symbol
+number_of_bits = 6; % number of bits per symbol
 
 upsampling_rate = 4; %rate of upsamping
 Fs = 2e6; % symbol frequency rate
