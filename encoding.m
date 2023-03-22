@@ -1,4 +1,4 @@
-function [encoded_bitstream] = hardEncoding(H,bitstream)
+function [encoded_bitstream] = encoding(H,bitstream)
     [M, N] = size(H)
     bitstream_length = length(bitstream);
     
@@ -8,7 +8,7 @@ function [encoded_bitstream] = hardEncoding(H,bitstream)
     G = [P I];
     
     encoded_bitstream = [];
-    for i = 1:5:bitstream_length
+    for i = 1:M:bitstream_length
         block = bitstream(i:i+M-1);
         encoded = mod(block*G, 2);
         encoded_bitstream = [encoded_bitstream encoded];

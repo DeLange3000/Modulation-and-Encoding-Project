@@ -54,7 +54,19 @@ H = [ 1 1 0 1 1 0 0 1 0 0;
       1 1 0 0 0 1 1 0 1 0;
       0 0 1 0 0 1 0 1 0 1 ];
 
-hardEncoding(H, bitstream)
+encoded_bitstream = encoding(H, bitstream)
+
+err_i = randi(length(encoded_bitstream),1,1);
+
+for i = err_i
+    encoded_bitstream(i) = mod(encoded_bitstream(i)+1, 2);
+end
+
+decoded_bitstream = hardDecoding(H, encoded_bitstream)
+
+if decoded_bitstream == bitstream
+    disp("yay!")
+end
 
 
 

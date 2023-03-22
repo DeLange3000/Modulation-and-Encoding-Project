@@ -39,9 +39,9 @@ end
 
 fprintf("Generating bitstream...\n")
 
-bit_stream = zeros(1, bitstream_length);
+bitstream = zeros(1, bitstream_length);
 for i = 1:bitstream_length
-    bit_stream(i) = round(rand());
+    bitstream(i) = round(rand());
 end
 
 %% encoding
@@ -54,21 +54,17 @@ H = [ 1 1 0 1 1 0 0 1 0 0;
       1 1 0 0 0 1 1 0 1 0;
       0 0 1 0 0 1 0 1 0 1 ];
 
-mat = mod(rref(H),2)
-I = mat(:,1:5);
-P = mat(:, 6:10)'
-G = [P I]
+encoded_bitstream = encoding(H, bitstream)
 
+err_i = randi(length(encoded_bitstream),1,3);
 
-encoded_bitstream = [];
-for i = 1:5:bitstream_length
-    block = bit_stream(i:i+4);
-    encoded = mod(block*H, 2);
-    encoded_bitstream = [encoded_bitstream encoded];
+err_bitstream = encoded_bitstream+ encoded_bitstream(err_i) 
+
+decoded_bitstream = hardDecoding(H, encoded_bitstream)
+
+if decoded_bitstream == bitstream
+    disp("yay!")
 end
-bit_stream;
-encoded_bitstream;
-bitstream_length;
 
 
 
