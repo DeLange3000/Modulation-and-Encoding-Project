@@ -5,7 +5,7 @@ clear
 %% input parameters
 
 
-Eb_N0_ratios_dB = 0:2:30; % 0:1:0;
+Eb_N0_ratios_dB = 0:1:30; % 0:1:0;
 
 
 Eb_N0_ratio_dB = 0;
@@ -14,11 +14,11 @@ Eb_N0_ratio = 10^(Eb_N0_ratio_dB/10); % noise power Eb/N0
 
 Eb_N0_ratios = 10.^(Eb_N0_ratios_dB/10);
 
-bitstream_length = 100000*4; %length of bitstream
+bitstream_length = 1000000*6; %length of bitstream
 
 % modulations possible:
 %   pam 1
-%   pam 2
+%   qam 2
 %   qam 4
 %   qam 6
 
@@ -28,7 +28,7 @@ number_of_bits = 6; % number of bits per symbol
 upsampling_rate = 4; %rate of upsamping
 Fs = 2e6; % symbol frequency rate
 beta = 0.3;
-filter_taps = 51;
+filter_taps = 101;
 
 %% checking compatibility
 if (not(mod(bitstream_length/number_of_bits,1) == 0))
@@ -67,13 +67,13 @@ end
 %     stem(real(output));
 %     stem(imag(output));
 
-% figure
-% plot(real(encoded_signal), imag(encoded_signal), '*');
-% title('Modulated signal')
-% xlabel('Real axis')
-% ylabel('Imaginairy axis')
-% set(gca, 'XAxisLocation', 'origin')
-% set(gca, 'YAxisLocation', 'origin')
+figure
+plot(real(encoded_signal), imag(encoded_signal), '*');
+title('Modulated signal')
+xlabel('Real axis')
+ylabel('Imaginairy axis')
+set(gca, 'XAxisLocation', 'origin')
+set(gca, 'YAxisLocation', 'origin')
 
 %% creating filter
 

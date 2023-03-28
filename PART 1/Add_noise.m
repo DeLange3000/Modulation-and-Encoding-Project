@@ -5,22 +5,23 @@ function [output] = Add_noise(input, Eb_N0_ratio, M, rate)
 % N0 is noise power
 
 fs = 2e6;
+fc = fs/2;
 T = 1/fs;
 band_width = fs*rate;
 Tsample = 1/band_width;
 
 %% calculate noise power
 
-Es = sum(abs(input).^2);
-Eb = Es/(2*M);
+Es = trapz(abs(input).^2);
+Eb = Es/(2*M*band_width*fs);
 
 N0 = Eb/Eb_N0_ratio; %N0 is power spectral density
-noise_power = N0*Tsample; % bandwidth is equal to samplingrate
+noise_power = N0*band_width; % bandwidth is equal to samplingrate
 
 
 %% add noise to output
 
-en = randn(length(input), 1)*sqrt(noise_power) + j*randn(length(input), 1)*sqrt(noise_power);
+en = randn(length(input), 1)*sqrt(noise_power) + 1i*randn(length(input), 1)*sqrt(noise_power);
 output = input + en;
 
 %% plot signal with noise in time domain
