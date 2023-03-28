@@ -11,16 +11,16 @@ Tsample = 1/band_width;
 
 %% calculate noise power
 
-Es = sum(abs(input).^2);
-Eb = Es/(2*M);
+Es = sum(abs(input).^2)*Tsample;
+Eb = Es/(2*M*length(input)/rate);
 
 N0 = Eb/Eb_N0_ratio; %N0 is power spectral density
-noise_power = N0*Tsample; % bandwidth is equal to samplingrate
+noise_power = N0*band_width; % bandwidth is equal to samplingrate
 
 
 %% add noise to output
 
-en = randn(length(input), 1)*sqrt(noise_power) + j*randn(length(input), 1)*sqrt(noise_power);
+en = randn(length(input), 1)*sqrt(noise_power) + 1i*randn(length(input), 1)*sqrt(noise_power);
 output = input + en;
 
 %% plot signal with noise in time domain

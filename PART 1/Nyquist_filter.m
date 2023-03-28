@@ -36,7 +36,8 @@ function [output] = Nyquist_filter(fs, rate, sample_length, beta, filter_taps)
     %% plot impulse response of filter
 
      filter_response = ifft(sqrt(ifftshift(f_filter_response)));
-     filter_response = fftshift(filter_response./filter_response(1)); % normalize
+     filter_response = fftshift(filter_response); % normalize
+     filter_response = filter_response/norm(filter_response);
      figure
      plot(linspace(-rate*T/2, rate*T/2 , filter_taps), filter_response)
      xlabel('Time (s)')

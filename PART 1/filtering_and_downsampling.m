@@ -8,7 +8,7 @@ function [output] = filtering_and_downsampling(input,rate, filter)
 
     t = 1/(rate*fs):1/(rate*fs):(length(input))/(rate*fs);
    
-    filtered = conv(input, filter, 'same');
+    filtered = conv(input, fliplr(filter), 'same');
 
     %% plot filtered signal
 
