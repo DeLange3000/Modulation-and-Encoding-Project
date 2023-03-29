@@ -1,5 +1,5 @@
 function [encoded_bitstream] = encoding(H,bitstream)
-    [M, N] = size(H)
+    [M, N] = size(H);
     bitstream_length = length(bitstream);
     
     mat = mod(rref(H),2);

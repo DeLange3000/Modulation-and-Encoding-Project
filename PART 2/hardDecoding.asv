@@ -1,4 +1,4 @@
-function [decoded_bs] = hardDecoding(H, rec_bs)
+function [dec_bs] = hardDecoding(H, rec_bs)
     [M, N] = size(H);
     rec_bs_l = length(rec_bs);
     
@@ -22,9 +22,10 @@ function [decoded_bs] = hardDecoding(H, rec_bs)
                 end
             end
         end
-        dec_block = sum(v_nodes, 1);
-        dec_block = round(dec_block/M)
-        de
+        cor_block = sum(v_nodes, 1);
+        cor_block = round(cor_block/M);
+        dec_block = cor_block(M+1:N);
+        dec_bs = [dec_bs dec_block];
     end
     
 end
