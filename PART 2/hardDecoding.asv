@@ -27,5 +27,6 @@ function [dec_bs] = hardDecoding(H, rec_bs)
         dec_block = cor_block(M+1:N);
         dec_bs = [dec_bs dec_block];
     end
+    rec_bs = 
     
 end

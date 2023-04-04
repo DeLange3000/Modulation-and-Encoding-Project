@@ -22,10 +22,16 @@ function [dec_bs] = hardDecoding(H, rec_bs)
                 end
             end
         end
-        cor_block = sum(v_nodes, 1);
-        cor_block = round(cor_block/M);
-        dec_block = cor_block(M+1:N);
+        %get non_zero indices of H
+
+        for i = M+1:N
+        H_nonzero = H(:,i)'.*(2:M+1); % add index due to offset in v_nodes
+        H_nonzero = nonzeros(H_nonzero);
+        cor_block = sum(v_nodes([1; H_nonzero],i));
+        cor_block = round(cor_block/(length(H_nonzero)+1));
+        dec_block = cor_block;
         dec_bs = [dec_bs dec_block];
+        end
     end
     
 end

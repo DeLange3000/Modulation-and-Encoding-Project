@@ -4,7 +4,7 @@ clear
 
 %% input parameters
 
-bitstream_length = 1000*4*5; %length of bitstream
+bitstream_length = 2*4*5; %length of bitstream
 
 %% generating bitstream
 
@@ -25,7 +25,8 @@ H = [ 1 1 0 1 1 0 0 1 0 0;
       1 1 0 0 0 1 1 0 1 0;
       0 0 1 0 0 1 0 1 0 1 ];
 
-encoded_bitstream = encoding(H, bitstream);
+% H = generate_ldpc(5, 10, 0, 1, 2);
+ encoded_bitstream = encoding(H, bitstream);
 
 
 fprintf("Adding errors...\n")

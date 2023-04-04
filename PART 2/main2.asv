@@ -19,17 +19,19 @@ end
 
 fprintf("Encoding...\n")
 
-H = [ 1 1 0 1 1 0 0 1 0 0;
-      0 1 1 0 1 1 1 0 0 0;
-      0 0 0 1 0 0 0 1 1 1;
-      1 1 0 0 0 1 1 0 1 0;
-      0 0 1 0 0 1 0 1 0 1 ];
+% H = [ 1 1 0 1 1 0 0 1 0 0;
+%       0 1 1 0 1 1 1 0 0 0;
+%       0 0 0 1 0 0 0 1 1 1;
+%       1 1 0 0 0 1 1 0 1 0;
+%       0 0 1 0 0 1 0 1 0 1 ];
+
+H = 
 
 encoded_bitstream = encoding(H, bitstream);
 
 
 fprintf("Adding errors...\n")
-errs = 0;
+errs = 1;
 
 err_i = randi(length(encoded_bitstream),1,errs);
 
