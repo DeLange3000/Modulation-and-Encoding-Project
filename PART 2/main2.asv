@@ -5,7 +5,7 @@ clear
 %% input parameters
 
 bitstream_length = 5*100; %length of bitstream
-N0 = 1;
+N0 = 0.5;
 number_of_iterations_HD = 5;
 number_of_iterations_SD = 10;
 
