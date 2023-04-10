@@ -32,6 +32,9 @@ function [dec_bs] = hardDecoding(H, rec_bs, number_of_iterations)
             cor_block = round(cor_block/(length(H_nonzero)+1));
             block(i) = cor_block;
             end
+            if(block*H' == 0)
+                break
+            end
         end
         dec_bs = [dec_bs block(M+1:N)];
     end
