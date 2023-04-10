@@ -3,7 +3,8 @@ function [dec_bs] = softDecoding(H,rec_bs, N0, number_of_iterations)
 [M, N] = size(H);
 rec_bs_l = length(rec_bs);
 var = N0/2;
-dec_bs = [];
+dec_bs = zeros(1, rec_bs_l/2);
+counter = 1;
 
     for block_i = 1:N:rec_bs_l
         decoded_block = zeros(1,N);
@@ -57,7 +58,8 @@ dec_bs = [];
             break
         end
         end
-        dec_bs = [dec_bs decoded_block(M+1:N)];
+        dec_bs(counter:counter + M -1) = decoded_block(M+1:N);
+        counter = counter + M;
 
     end
 

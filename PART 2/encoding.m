@@ -9,11 +9,11 @@ function [encoded_bitstream, H] = encoding(H,bitstream)
     G = [P I];
 
     
-    encoded_bitstream = [];
+    encoded_bitstream = zeros(1, length(bitstream)*2);
     for i = 1:M:bitstream_length
         block = bitstream(i:i+M-1);
         [encoded, H] = encode_ldpc(block', H, 0);
-        encoded_bitstream = [encoded_bitstream [encoded' block]];
+        encoded_bitstream(i:i+N-1) = [encoded' block];
 
         %------- for premade H ----
         %encoded = mod(block*G, 2)
