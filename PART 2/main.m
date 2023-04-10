@@ -14,7 +14,7 @@ Eb_N0_ratio = 10^(Eb_N0_ratio_dB/10); % noise power Eb/N0
 
 Eb_N0_ratios = 10.^(Eb_N0_ratios_dB/10);
 
-bitstream_length = 1000000; %length of bitstream
+bitstream_length = 10000; %length of bitstream
 
 % modulations possible (for part 2):
 %   pam 1
@@ -137,7 +137,7 @@ for i = 1:length(Eb_N0_ratios)
     fprintf("("+i+")\n")
     decodeds = demapping(filtered_signals_receiver(:,i), number_of_bits, modulation);
     decodeds_HD(:,i) = hardDecoding(H, decodeds', number_of_iterations_HD)';
-    %decodeds_SD(:,i) = softDecoding(H, filtered_signals_receiver(:, i)', N0,  number_of_iterations_SD)';
+    decodeds_SD(:,i) = softDecoding(H, filtered_signals_receiver(:, i)', N0,  number_of_iterations_SD)';
 end
 
 
