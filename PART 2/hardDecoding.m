@@ -1,31 +1,44 @@
-function [dec_bs] = hardDecoding(H, rec_bs)
+function [dec_bs] = hardDecoding(H, rec_bs, number_of_iterations)
     [M, N] = size(H);
     rec_bs_l = length(rec_bs);
-    
-    dec_bs = [];
-	
+    dec_bs = zeros(1, rec_bs_l/2);
+
+    counter = 1;
     for block_i = 1:N:rec_bs_l
-        block = rec_bs(block_i:block_i+N-1);
-
-        v_nodes = zeros(M+1, N);
-        v_nodes(1, :) = block;
-        
-        for i = 1:M
-            % #rogier is genius
-            arr = nonzeros(H(i,:) .* (1:N))';
-
-            for j = arr
-                arr_sel = arr(arr~=j);
-                selected = block(arr_sel);
-                if mod(sum(selected), 2) == 1
-                    v_nodes(i+1, j) = 1;
+        for a = 1:1 %number_of_iterations
+            block = rec_bs(block_i:block_i+N-1);
+    
+            v_nodes = zeros(M+1, N);
+            v_nodes(1, :) = block;
+            
+            for i = 1:M
+                % #rogier is genius
+                arr = nonzeros(H(i,:) .* (1:N))';
+    
+                for j = arr
+                    arr_sel = arr(arr~=j);
+                    selected = block(arr_sel);
+                    if mod(sum(selected), 2) == 1
+                        v_nodes(i+1, j) = 1;
+                    end
                 end
             end
+            %get non_zero indices of H
+    
+            for i = 1:N
+            H_nonzero = H(:,i)'.*(2:M+1); % add index due to offset in v_nodes
+            H_nonzero = nonzeros(H_nonzero);
+            cor_block = sum(v_nodes([1; H_nonzero],i));
+            cor_block = round(cor_block/(length(H_nonzero)+1));
+            block(i) = cor_block;
+            end
+            if(block*H' == 0)
+                break
+            end
         end
-        cor_block = sum(v_nodes, 1);
-        cor_block = round(cor_block/M);
-        dec_block = cor_block(M+1:N);
-        dec_bs = [dec_bs dec_block];
+        
+        dec_bs(M*(counter-1) + 1:M*(counter)) = block(M+1:N);
+        counter = counter + 1;
     end
     
 end

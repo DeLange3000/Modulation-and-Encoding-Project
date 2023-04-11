@@ -1,57 +1,66 @@
-function [dec_bs] = softDecoding(H, rec_bs, sigma2_w)
-    [M, N] = size(H);
-    rec_bs_l = length(rec_bs);
-    
-    dec_bs = [];
+function [dec_bs] = softDecoding(H,rec_bs, N0, number_of_iterations)
+
+[M, N] = size(H);
+rec_bs_l = length(rec_bs);
+var = N0/2;
+dec_bs = zeros(1, rec_bs_l/2);
+counter = 1;
 
     for block_i = 1:N:rec_bs_l
+        decoded_block = zeros(1,N);
         block = rec_bs(block_i:block_i+N-1);
-
-        v_nodes = zeros(M+1, N);
-        v_nodes(1, :) = block;
-
-		v_nodes = block;
-
-		r = block;
-		q0 = zeros(M,N);
-		for i = 1:N
-			q0(:,i) = 1/(1+exp(2*r(i)/sigma2_w));
-		end
-		q1 = 1 - q0;
-		rmat0 = zeros(M, N);
-		for i = 1:M
-			for j = 1:N
-				prod = 1;
-				for p = 1:N
-					if p ~= j
-						prod = prod*(1-2*q1(i,p));
-					end
-				end
-				rmat0(i,j) = 0.5*(1+prod);
-			end
-		end
-
-		rmat1 = 1 - rmat0;
-
-        for i = 1:M
-            % #rogier is genius
-            arr = nonzeros(H(i,:) .* (1:N))';
-
-            for j = arr
-                arr_sel = arr(arr~=j);
-                selected = block(arr_sel);
-
-				q
-
-                if mod(sum(selected), 2) == 1
-                    v_nodes(i+1, j) = 1;
+        H_index = H.*(1:M)';
+        L_q = zeros(M, N);
+        L_r = zeros(M, N);
+        %make L_q
+        for j = 1:N
+            L_q(nonzeros(H_index(:,j)),j) = -2*block(j)/var; %create L matrix
+        end
+        
+        % loop from here 10 times
+        
+        for b = 1:number_of_iterations
+            %make L_r
+            for j = 1:N
+                for a = nonzeros(H_index(:,j))' %loops over non zero H indices
+                y_index = 1:N;
+                y_index = y_index(y_index~=j); %j itself cannot be included
+                    if(isempty(nonzeros(L_q(a, y_index)))) %if only zero elements are present, make L_r zero
+                        L_r(a,j) = 0;
+                    else
+                        L_r(a,j) = prod(sign(nonzeros(L_q(a, y_index))), 'all')*min(nonzeros(abs(L_q(a, y_index))), [], 'all');  %create L matrix
+                    end
                 end
             end
+            
+            %add L_r to L_q
+            for j = 1:N
+                for a = nonzeros(H_index(:, j))'
+                    x_index = 1:M;
+                    x_index = x_index(x_index~=a); %j itself cannot be included
+                    L_q(a,j) =  L_q(a,j) + sum(L_r(x_index,j));
+                end
+            end
+        
+        
+        % stop loop 10 times here
+
+        for j = 1:N
+            L_Q = -2*block(j)/var + sum(L_r(:,j));
+            if(L_Q < 0)
+                decoded_block(j) = 1;
+            else
+                decoded_block(j) = 0;
+            end
         end
-        cor_block = sum(v_nodes, 1);
-        cor_block = round(cor_block/M);
-        dec_block = cor_block(M+1:N);
-        dec_bs = [dec_bs dec_block];
+        
+        if(decoded_block*H' == 0)
+            break
+        end
+        end
+        dec_bs(counter:counter + M -1) = decoded_block(M+1:N);
+        counter = counter + M;
+
     end
-    
+
 end
