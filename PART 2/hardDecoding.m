@@ -3,7 +3,7 @@ function [dec_bs] = hardDecoding(H, rec_bs)
     rec_bs_l = length(rec_bs);
     
     dec_bs = [];
-
+	
     for block_i = 1:N:rec_bs_l
         block = rec_bs(block_i:block_i+N-1);
 

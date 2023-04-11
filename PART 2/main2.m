@@ -4,7 +4,7 @@ clear
 
 %% input parameters
 
-bitstream_length = 1000*4*5; %length of bitstream
+bitstream_length = 100*5; %length of bitstream
 
 %% generating bitstream
 
