@@ -1,4 +1,4 @@
-function [output, N0] = Add_noise(input, Eb_N0_ratio, M, rate)
+function output = Add_noise(input, Eb_N0_ratio, M, rate)
 
 % additive white gaussian noise
 % has real and imaginairy part that are independent from each other
@@ -20,7 +20,7 @@ noise_power = N0*band_width; % bandwidth is equal to samplingrate
 
 %% add noise to output
 
-en = randn(length(input), 1)*sqrt(noise_power);
+en = randn(length(input), 1)*sqrt(noise_power) + 1i*randn(length(input), 1)*sqrt(noise_power);
 output = input + en;
 
 %% plot signal with noise in time domain

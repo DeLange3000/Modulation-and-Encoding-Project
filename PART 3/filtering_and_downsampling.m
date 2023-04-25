@@ -1,4 +1,4 @@
-function [output] = filtering_and_downsampling(input,rate, filter)
+function [output] = filtering_and_downsampling(input,rate, filter, shifts)
 
     fc = 1e6;
     fs = 2e6; %symbol rate
@@ -29,7 +29,7 @@ function [output] = filtering_and_downsampling(input,rate, filter)
 
     output = zeros(length(filtered)/rate, 1);
     a = 1;
-    for i =1:rate:length(filtered)
+    for i =1+shifts:rate:length(filtered)
         output(a) = filtered(i);
         a = a + 1;
     end
