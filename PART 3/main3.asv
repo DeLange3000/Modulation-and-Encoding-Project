@@ -23,7 +23,7 @@ bitstream_length = 1000000; %length of bitstream
 modulation = 'qam'; % pam or qam
 number_of_bits = 4; % number of bits per symbol
 
-upsampling_rate = 10; %rate of upsamping
+upsampling_rate = 20; %rate of upsamping
 Fs = 2e6; % symbol frequency rate
 beta = 0.3;
 filter_taps = 10*upsampling_rate+1;
@@ -35,7 +35,7 @@ F_carrier = 2e9;
 CFO = ppm*F_carrier; % carrier frequency offset
 phase_offset_degrees  = 0; %[0 1 2 5 10 20 30 45 60]
 phase_offset = phase_offset_degrees/360*2*pi; %between 0 and 2*pi
-sample_time_shift = 0.5*1/Fs; %between zero and 1/Fs = 5e-7
+sample_time_shift = 0.1*1/Fs; %between zero and 1/Fs = 5e-7
 
 t = 0:1/(upsampling_rate*Fs):((bitstream_length*upsampling_rate - 1)/(upsampling_rate*Fs));
 
