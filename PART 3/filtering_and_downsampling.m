@@ -27,9 +27,9 @@ function [output] = filtering_and_downsampling(input,rate, filter, shifts)
 %         output = [output; filtered(i)];
 %     end
 
-    output = zeros(length(filtered)/rate, 1);
+    output = zeros((length(filtered)-(rate-1))/rate, 1);
     a = 1;
-    for i =1+shifts:rate:length(filtered)
+    for i = (rate+shifts):rate:length(filtered)
         output(a) = filtered(i);
         a = a + 1;
     end

@@ -9,8 +9,10 @@ function [output] = upsampling_and_filtering(input, rate, filter)
     T = 1/fs;
     for i = 1:length(input)
         oversampled(rate*(i-1)+1) = (input(i));
-        oversampled(rate*(i-1)+2:rate*i) = 0; %input(i);
+        oversampled(rate*(i-1)+2:rate*(i)) = 0; %input(i);
     end
+
+    oversampled = [zeros(rate - 1, 1); oversampled];
 
     %% plot unfiltered signal in time and frequency domain
 
@@ -40,12 +42,12 @@ function [output] = upsampling_and_filtering(input, rate, filter)
     xlabel('Time (s)')
     ylabel('Amplitude')
 
-    figure
-    hold on
-    plot( -fs:fs*2/(length(input)*rate):fs - fs/(rate*length(input)), real(fftshift(fft(filtered))))
-    title('frequency domain signal (filtered)')
-    xlabel('Frequency (f)')
-    ylabel('Amplitude')
+%     figure
+%     hold on
+%     plot( -fs:fs*2/(length(input)*rate):fs - fs/(rate*length(input)), real(fftshift(fft(filtered))))
+%     title('frequency domain signal (filtered)')
+%     xlabel('Frequency (f)')
+%     ylabel('Amplitude')
 
 
     %% return filtered signal

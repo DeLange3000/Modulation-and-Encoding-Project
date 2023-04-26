@@ -1,11 +1,11 @@
 clc;
-%close all
+close all
 clear
 
 %% input parameters
 
 
-Eb_N0_ratios_dB = 0:2:18; % 0:1:0;
+Eb_N0_ratios_dB = 0:2:16; % 0:1:0;
 
 
 Eb_N0_ratio_dB = 0;
@@ -15,27 +15,27 @@ Eb_N0_ratio = 10^(Eb_N0_ratio_dB/10); % noise power Eb/N0
 Eb_N0_ratios = 10.^(Eb_N0_ratios_dB/10);
 
 
-bitstream_length = 2 ; %length of bitstream
+bitstream_length = 100000; %length of bitstream
 
 % modulations possible (for part 2):
 %   pam 1
 
-modulation = 'pam'; % pam or qam
-number_of_bits = 1; % number of bits per symbol
+modulation = 'qam'; % pam or qam
+number_of_bits = 4; % number of bits per symbol
 
-upsampling_rate = 400; %rate of upsamping
+upsampling_rate = 50; %rate of upsamping
 Fs = 2e6; % symbol frequency rate
 beta = 0.3;
 filter_taps = 10*upsampling_rate+1;
 
 % part 3
 
-ppm = 10*1e-6;
+ppm = 0*1e-6;
 F_carrier = 2e9;
 CFO = ppm*F_carrier; % carrier frequency offset
 phase_offset_degrees  = 0; %[0 2 5 10 15 20 30 45 60]
 phase_offset = phase_offset_degrees/360*2*pi; %between 0 and 2*pi
-sample_time_shift = 0*0.01*1e-7; %between zero and 1/Fs = 5e-7
+sample_time_shift = 0.5*1e-7; %between zero and 1/Fs = 5e-7
 
 t = 0:1/(upsampling_rate*Fs):((bitstream_length*upsampling_rate - 1)/(upsampling_rate*Fs));
 
@@ -56,12 +56,10 @@ end
 
 fprintf("Generating bitstream...\n")
 
-% bit_stream = zeros(bitstream_length,1);
-% for i = 1:bitstream_length
-%     bit_stream(i) = round(rand());
-% end
-
-bit_stream = [1; 0];
+bit_stream = zeros(bitstream_length,1);
+for i = 1:bitstream_length
+    bit_stream(i) = round(rand());
+end
 
 %% encoding
 
@@ -123,15 +121,15 @@ end
 
 fprintf("Filtering & downsampling...\n")
 
-% filtered_signal_receiver = filtering_and_downsampling(noisy_signal, upsampling_rate, filter);
-% 
-% figure
-% plot(real(filtered_signal_receiver), imag(filtered_signal_receiver), '*')
-% title('downsampled received signal')
-% xlabel('Real axis')
-% ylabel('Imaginairy axis')
-% set(gca, 'XAxisLocation', 'origin')
-% set(gca, 'YAxisLocation', 'origin')
+filtered_signal_receiver = filtering_and_downsampling(noisy_signal, upsampling_rate, filter,shifts);
+
+figure
+plot(real(filtered_signal_receiver), imag(filtered_signal_receiver), '*')
+title('downsampled received signal')
+xlabel('Real axis')
+ylabel('Imaginairy axis')
+set(gca, 'XAxisLocation', 'origin')
+set(gca, 'YAxisLocation', 'origin')
 
 filtered_signals_receiver = zeros(length(encoded_signal), length(Eb_N0_ratios));
 filtered_signals_receiver_CFO = zeros(length(encoded_signal), length(Eb_N0_ratios));
@@ -145,7 +143,7 @@ tnew = (0:length(filtered_signals_receiver_CFO(:, 1))-1)/Fs;
 
 for j = 1:length(Eb_N0_ratios)
     fprintf("("+j+")\n")
-        filtered_signals_receiver_CFO(:, j) = filtered_signals_receiver_CFO(:,j).*exp(-1i*(2*pi*CFO*tnew' + phase_offset));
+        filtered_signals_receiver_CFO(:, j) = filtered_signals_receiver_CFO(:,j).*exp(-1i*(2*pi*CFO*tnew'));
 %     figure
 %     plot(t, noisy_signals(:,j))
 end
