@@ -15,22 +15,22 @@ Eb_N0_ratio = 10^(Eb_N0_ratio_dB/10); % noise power Eb/N0
 Eb_N0_ratios = 10.^(Eb_N0_ratios_dB/10);
 
 
-bitstream_length = 16 ; %length of bitstream
+bitstream_length = 2 ; %length of bitstream
 
 % modulations possible (for part 2):
 %   pam 1
 
-modulation = 'qam'; % pam or qam
-number_of_bits = 4; % number of bits per symbol
+modulation = 'pam'; % pam or qam
+number_of_bits = 1; % number of bits per symbol
 
-upsampling_rate = 40000; %rate of upsamping
+upsampling_rate = 400; %rate of upsamping
 Fs = 2e6; % symbol frequency rate
 beta = 0.3;
-filter_taps = 101;
+filter_taps = 10*upsampling_rate+1;
 
 % part 3
 
-ppm = 0*1e-6;
+ppm = 10*1e-6;
 F_carrier = 2e9;
 CFO = ppm*F_carrier; % carrier frequency offset
 phase_offset_degrees  = 0; %[0 2 5 10 15 20 30 45 60]
@@ -56,10 +56,12 @@ end
 
 fprintf("Generating bitstream...\n")
 
-bit_stream = zeros(bitstream_length,1);
-for i = 1:bitstream_length
-    bit_stream(i) = round(rand());
-end
+% bit_stream = zeros(bitstream_length,1);
+% for i = 1:bitstream_length
+%     bit_stream(i) = round(rand());
+% end
+
+bit_stream = [1; 0];
 
 %% encoding
 
