@@ -1,11 +1,11 @@
 clc;
-close all
+%close all
 clear
 
 %% input parameters
 
 
-Eb_N0_ratios_dB = 0:2:10; % 0:1:0;
+Eb_N0_ratios_dB = 0:2:18; % 0:1:0;
 
 
 Eb_N0_ratio_dB = 0;
@@ -15,15 +15,15 @@ Eb_N0_ratio = 10^(Eb_N0_ratio_dB/10); % noise power Eb/N0
 Eb_N0_ratios = 10.^(Eb_N0_ratios_dB/10);
 
 
-bitstream_length = 1000000 ; %length of bitstream
+bitstream_length = 16 ; %length of bitstream
 
 % modulations possible (for part 2):
 %   pam 1
 
-modulation = 'pam'; % pam or qam
-number_of_bits = 1; % number of bits per symbol
+modulation = 'qam'; % pam or qam
+number_of_bits = 4; % number of bits per symbol
 
-upsampling_rate = 500; %rate of upsamping
+upsampling_rate = 40000; %rate of upsamping
 Fs = 2e6; % symbol frequency rate
 beta = 0.3;
 filter_taps = 101;
@@ -35,7 +35,7 @@ F_carrier = 2e9;
 CFO = ppm*F_carrier; % carrier frequency offset
 phase_offset_degrees  = 0; %[0 2 5 10 15 20 30 45 60]
 phase_offset = phase_offset_degrees/360*2*pi; %between 0 and 2*pi
-sample_time_shift = 0.01*1e-7; %between zero and 1/Fs = 5e-7
+sample_time_shift = 0*0.01*1e-7; %between zero and 1/Fs = 5e-7
 
 t = 0:1/(upsampling_rate*Fs):((bitstream_length*upsampling_rate - 1)/(upsampling_rate*Fs));
 
@@ -95,7 +95,7 @@ filtered_signal = upsampling_and_filtering(encoded_signal, upsampling_rate, filt
 %% add noise
 
 fprintf("Adding noise...\n")
-% noisy_signal = Add_noise(filtered_signal, Eb_N0_ratio, number_of_bits, upsampling_rate);
+noisy_signal = Add_noise(filtered_signal, Eb_N0_ratio, number_of_bits, upsampling_rate);
 
 noisy_signals = zeros(length(filtered_signal), length(Eb_N0_ratios));
 for i = 1:length(Eb_N0_ratios)
@@ -107,11 +107,12 @@ end
 
 fprintf('Adding CFO, phase offset and sampling time offset...\n')
 
-%t = (0:length(noisy_signals(:,1)) - 1)/(Fs*upsampling_rate);
+t = (0:length(noisy_signals(:,1)) - 1)/(Fs*upsampling_rate);
 
 for j = 1:length(Eb_N0_ratios)
     fprintf("("+j+")\n")
-        noisy_signals(:, j) = noisy_signals(:,j).*exp(1i*(2*pi*CFO*t' + phase_offset));
+        noisy_signals_CFO(:, j) = noisy_signals(:,j).*exp(1i*(2*pi*CFO*t' + phase_offset));
+		%noisy_signals_CFO(:, j) = noisy_signals(:,j);
 %     figure
 %     plot(t, noisy_signals(:,j))
 end
@@ -131,9 +132,20 @@ fprintf("Filtering & downsampling...\n")
 % set(gca, 'YAxisLocation', 'origin')
 
 filtered_signals_receiver = zeros(length(encoded_signal), length(Eb_N0_ratios));
+filtered_signals_receiver_CFO = zeros(length(encoded_signal), length(Eb_N0_ratios));
 for j = 1:length(Eb_N0_ratios)
     fprintf("("+j+")\n")
     filtered_signals_receiver(:, j) = filtering_and_downsampling(noisy_signals(:,j), upsampling_rate, filter, shifts);
+	filtered_signals_receiver_CFO(:, j) = filtering_and_downsampling(noisy_signals_CFO(:,j), upsampling_rate, filter, shifts);
+end
+
+tnew = (0:length(filtered_signals_receiver_CFO(:, 1))-1)/Fs;
+
+for j = 1:length(Eb_N0_ratios)
+    fprintf("("+j+")\n")
+        filtered_signals_receiver_CFO(:, j) = filtered_signals_receiver_CFO(:,j).*exp(-1i*(2*pi*CFO*tnew' + phase_offset));
+%     figure
+%     plot(t, noisy_signals(:,j))
 end
 
 
@@ -141,9 +153,11 @@ end
 
 fprintf("Decoding...\n")
 decodeds = zeros(length(bit_stream), length(Eb_N0_ratios));
+decodeds_CFO = zeros(length(bit_stream), length(Eb_N0_ratios));
 for i = 1:length(Eb_N0_ratios)
     fprintf("("+i+")\n")
     decodeds(:,i) = demapping(filtered_signals_receiver(:,i), number_of_bits, modulation);
+	decodeds_CFO(:,i) = demapping(filtered_signals_receiver_CFO(:,i), number_of_bits, modulation);
 end
 
 
@@ -154,21 +168,31 @@ fprintf("Calculating BER...\n")
     
 ERRs = zeros(length(Eb_N0_ratios), 1);
 BERs = zeros(length(Eb_N0_ratios), 1);
+ERRs_CFO = zeros(length(Eb_N0_ratios), 1);
+BERs_CFO = zeros(length(Eb_N0_ratios), 1);
 for i = 1:length(Eb_N0_ratios)
     fprintf("("+i+")\n")
     dec = decodeds(:,i);
+	dec_CFO = decodeds_CFO(:,i);
     for a = 1:length(dec)
         if (dec(a) ~= bit_stream(a))
             ERRs(i) = ERRs(i) + 1;
+		end
+		if (dec_CFO(a) ~= bit_stream(a))
+            ERRs_CFO(i) = ERRs_CFO(i) + 1;
         end
     end
     BERs(i) = ERRs(i)/length(dec);
+	BERs_CFO(i) = ERRs_CFO(i)/length(dec);
 end
 
 figure
 semilogy(10*log10(Eb_N0_ratios), BERs)
+hold on
+semilogy(10*log10(Eb_N0_ratios), BERs_CFO)
 xlabel("Eb/N0 [dB]")
 ylabel("BER")
+legend("no CFO", "CFO")
 
 
 %% plot BER
@@ -225,15 +249,14 @@ BER_qam6 = [0.199876000000000
 
 % CFO modulation
 
-figure
-hold on
-plot(0:10, BER_pam1(1:11))
+%figure
+%hold on
+%plot(0:16, BER_pam1(1:11))
 % plot(0:10, BER_qam2(1:11))
 % plot(0:10, BER_qam4(1:11))
 % plot(0:10, BER_qam6(1:11))
-set(gca, 'YScale', 'log')
-xlabel('Eb/N0')
-ylabel("BER")
-legend('BPSK')
+%set(gca, 'YScale', 'log')
+%ylabel("BER")
+%legend('BPSK')
 % legend('BPSK', 'QPSK', '16QAM', '64QAM')
 

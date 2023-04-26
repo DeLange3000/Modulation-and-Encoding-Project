@@ -1,8 +1,10 @@
-function [output] = Nyquist_filter(fs, rate, sample_length, beta, filter_taps)
+function [output] = Nyquist_filter(fs, rate, sample_length, beta)
 
     %% filter parameters
     fc = fs/2;
     T = 1/fs;
+
+	filter_res = 101*rate;
 
     %% filter calculation
 
@@ -12,7 +14,7 @@ function [output] = Nyquist_filter(fs, rate, sample_length, beta, filter_taps)
     % sqrt(0.5*(1+cos(pi/(beta*fc) * (f - (1-beta)fc/2))) for frequencies
     % inbetween
 
-    f_axis = linspace(-fs,fs, filter_taps);
+    f_axis = linspace(-fs*rate,fs*rate, filter_res);
     f_filter_response = zeros(1, length(f_axis));
     for i = 1:length(f_filter_response)
         if abs(f_axis(i)) <= (1-beta)/(2*T)
@@ -35,16 +37,17 @@ function [output] = Nyquist_filter(fs, rate, sample_length, beta, filter_taps)
 
     %% plot impulse response of filter
 
-     filter_response = ifft(sqrt(ifftshift(f_filter_response)));
-     filter_response = fftshift(filter_response); % normalize
-     filter_response = filter_response/norm(filter_response);
+      filter_response = ifft(sqrt(ifftshift(f_filter_response)));
+      filter_response = fftshift(filter_response); % normalize
+      filter_response = filter_response/norm(filter_response);
+	  %filter_response = downsample(filter_response,	100)
      figure
-     plot(linspace(-rate*T/2, rate*T/2 , filter_taps), filter_response)
+     plot((filter_response))
      xlabel('Time (s)')
      ylabel('Amplitude')
      title('Nyquist filter in time domain')
-%      figure
-%      impz(filter_response)
+     %figure
+     %impz(filter_response)
 
     %% return positive frequencies of filter
 
