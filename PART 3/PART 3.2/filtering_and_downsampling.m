@@ -36,6 +36,9 @@ function [output, Garner_errors] = filtering_and_downsampling(input,rate, filter
     Garner_error_index = 0;
     for i = (rate + shifts):rate:length(filtered)
         i = i + Garner_error_index;
+        if(i > length(filtered))
+            uh = 0;
+        end
         %plot(t(round(i)), real(filtered(round(i))), '*')
         if(mod(i, 1) ~= 0)
             %interpolation
@@ -59,7 +62,7 @@ function [output, Garner_errors] = filtering_and_downsampling(input,rate, filter
             else
                 sample_halfway = filtered(i - rate/2);
             end
-            Garner_error = Garner_error - error_factor_K*real(sample_halfway*(conj(output(a))- conj(output(a-1))));
+            Garner_error = Garner_error - 2*error_factor_K*real(sample_halfway*(conj(output(a))- conj(output(a-1))));
             Garner_errors(a) =  Garner_error;
             Garner_error_index = Garner_error/t(1)*T;
 
