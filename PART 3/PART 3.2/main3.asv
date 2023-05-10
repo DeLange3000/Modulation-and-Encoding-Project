@@ -5,7 +5,7 @@ clear
 %% input parameters
 
 
-Eb_N0_ratios_dB = 0; % 0:1:16; % 0:1:0;
+Eb_N0_ratios_dB = inf %0:1:16; % 0:1:0;
 
 
 Eb_N0_ratio_dB = 0;
@@ -15,7 +15,7 @@ Eb_N0_ratio = 10^(Eb_N0_ratio_dB/10); % noise power Eb/N0
 Eb_N0_ratios = 10.^(Eb_N0_ratios_dB/10);
 
 
-bitstream_length = 40; %length of bitstream
+bitstream_length = 100000; %length of bitstream
 
 % modulations possible (for part 2):
 %   pam 1
@@ -23,14 +23,14 @@ bitstream_length = 40; %length of bitstream
 modulation = 'qam'; % pam or qam
 number_of_bits = 4; % number of bits per symbol
 
-upsampling_rate = 100; %rate of upsamping
+upsampling_rate = 50; %rate of upsamping
 Fs = 2e6; % symbol frequency rate
 beta = 0.3;
 filter_taps = 10*upsampling_rate+1;
 
 % part 3
 
-ppm = 0*1e-6;
+ppm = 10*1e-6;
 F_carrier = 2e9;
 CFO = ppm*F_carrier; % carrier frequency offset
 phase_offset_degrees  = 0; %[0 1 2 5 10 20 30 45 60]
@@ -43,6 +43,11 @@ shifts = sample_time_shift/t(2);
 
 % garner
 error_factor_K = 0.01;
+
+% frame sync
+pilot_length = 40;
+pilot = randi(2, pilot_length,1)-1;
+pilot_int = 1000;
 
 
 %% checking compatibility
@@ -59,6 +64,17 @@ bit_stream = zeros(bitstream_length,1);
 for i = 1:bitstream_length
     bit_stream(i) = round(rand());
 end
+
+%% insert pilots
+
+fprintf("Inserting pilot sequences...\n")
+
+for i = 1:pilot_int:bitstream_length+pilot_length*ceil(bitstream_length/(pilot_int-pilot_length))
+	begin = bit_stream(1:i-1);
+	rest = bit_stream(i:end);
+	bit_stream = [begin; pilot; rest];
+end
+
 
 %% encoding
 
@@ -149,10 +165,23 @@ end
 
 %% plot garner errors
 
-figure
-plot(Garner_errors(:,1))
-xlabel('symbols')
-ylabel('Error of sampling time offset')
+for i = 1: length(Eb_N0_ratios)
+    figure
+    plot(sample_time_shift*Fs + Garner_errors(:,i))
+    xlabel('symbols')
+    ylabel('Error of sampling time offset')
+    title(['Eb/N0 equal to ' num2str(Eb_N0_ratios_dB(i))])
+end
+
+%%
+
+bigwindow = 1000;
+
+[argmaxn, ~] = toa_est(pilot, decodeds(1:bigwindow,1), 8, 1/2e6);
+
+time_shift = argmaxn;
+begin_of_frame = time_shift+pilot_length;
+end_of_frame = toa_est(pilot, decodeds(bigwindow:begin_of))
 
 %% checking BER
 
