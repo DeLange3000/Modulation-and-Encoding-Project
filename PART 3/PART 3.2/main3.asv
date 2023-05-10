@@ -14,7 +14,7 @@ Eb_N0_ratio = 10^(Eb_N0_ratio_dB/10); % noise power Eb/N0
 Eb_N0_ratios = 10.^(Eb_N0_ratios_dB/10);
 
 
-bitstream_length = 16; %length of bitstream
+bitstream_length = 2500; %length of bitstream
 
 % modulations possible (for part 2):
 %   pam 1
@@ -29,11 +29,11 @@ filter_taps = 10*upsampling_rate+1;
 
 % part 3
 
-ppms = [0 5 10 20 50 100]*1e-6;
+ppms = [0 1 2 10 20 50]*1e-6;
 ppm = 0*1e-6;
 F_carrier = 2e9;
 CFO = ppm*F_carrier; % carrier frequency offset
-CFOs = ppms*F_carrier;
+CFOs = ppms.*F_carrier;
 phase_offset_degrees  = 0; %[0 1 2 5 10 20 30 45 60]
 phase_offset = phase_offset_degrees/360*2*pi; %between 0 and 2*pi
 sample_time_shift = 0.40*1/Fs; %between zero and 1/Fs = 5e-7
@@ -44,9 +44,9 @@ shifts = sample_time_shift/t(2);
 
 % garner
 %error_factors_K = linspace(0.001, 0.01, 6);
-error_factor_K = 0.05; 
+error_factor_K = 0.01; 
 coulors = ["blue", "red", "green", "black", "cyan", "magenta"];
-averaging_length = 1;
+averaging_length = 100;
 
 
 %% checking compatibility
@@ -121,8 +121,13 @@ t = (0:length(noisy_signals(:,1)) - 1)/(Fs*upsampling_rate);
 
 for j = 1:length(Eb_N0_ratios)
     fprintf("("+j+")\n")
-        noisy_signals(:, j) = noisy_signals(:,j).*exp(1i*(2*pi*CFO*t' + phase_offset));
-        
+%     figure
+%     hold on
+%     plot(abs(noisy_signals(:, j)))
+%     plot(angle(noisy_signals(:, j)))
+        noisy_signals(:, j) = noisy_signals(:,j).*exp(1j*(2*pi*CFO*t' + phase_offset));
+%     plot(abs(noisy_signals(:, j)))    
+%     plot(angle(noisy_signals(:, j)))
 end
 
 %% inverse nyquist filter and downsamping

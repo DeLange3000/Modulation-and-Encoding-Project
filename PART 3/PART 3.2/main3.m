@@ -14,7 +14,7 @@ Eb_N0_ratio = 10^(Eb_N0_ratio_dB/10); % noise power Eb/N0
 Eb_N0_ratios = 10.^(Eb_N0_ratios_dB/10);
 
 
-bitstream_length = 2500; %length of bitstream
+bitstream_length = 400; %length of bitstream
 
 % modulations possible (for part 2):
 %   pam 1
@@ -29,7 +29,7 @@ filter_taps = 10*upsampling_rate+1;
 
 % part 3
 
-ppms = [0 5 10 20 50 100]*1e-6;
+ppms = [0 1 2 10 20 50]*1e-6;
 ppm = 0*1e-6;
 F_carrier = 2e9;
 CFO = ppm*F_carrier; % carrier frequency offset
