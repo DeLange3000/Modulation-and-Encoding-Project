@@ -7,21 +7,19 @@ clear
 
 Eb_N0_ratios_dB = 10 %0:1:16; % 0:1:0;
 
-
 Eb_N0_ratio_dB = 0;
 
 Eb_N0_ratio = 10^(Eb_N0_ratio_dB/10); % noise power Eb/N0
 
 Eb_N0_ratios = 10.^(Eb_N0_ratios_dB/10);
 
-
-bitstream_length = 100000; %length of bitstream
+bitstream_length = 2000; %length of bitstream
 
 % modulations possible (for part 2):
 %   pam 1
 
 modulation = 'qam'; % pam or qam
-number_of_bits = 4; % number of bits per symbol
+number_of_bits = 2; % number of bits per symbol
 
 upsampling_rate = 50; %rate of upsamping
 Fs = 2e6; % symbol frequency rate
@@ -35,7 +33,7 @@ F_carrier = 2e9;
 CFO = ppm*F_carrier; % carrier frequency offset
 phase_offset_degrees  = 0; %[0 1 2 5 10 20 30 45 60]
 phase_offset = phase_offset_degrees/360*2*pi; %between 0 and 2*pi
-sample_time_shift = 0.1*1/Fs; %between zero and 1/Fs = 5e-7
+sample_time_shift = 0.40*1/Fs; %between zero and 1/Fs = 5e-7
 
 t = 0:1/(upsampling_rate*Fs):((bitstream_length*upsampling_rate - 1)/(upsampling_rate*Fs));
 
@@ -167,10 +165,10 @@ end
 
 for i = 1: length(Eb_N0_ratios)
     figure
-    plot(sample_time_shift*Fs + Garner_errors(:,i))
+    plot(sample_time_shift + Garner_errors(:,i)/Fs)
     xlabel('symbols')
-    ylabel('Error of sampling time offset')
-    title(['Eb/N0 equal to ' num2str(Eb_N0_ratios_dB(i))])
+    ylabel('Error of sampling time offset (expressed in symbol periods)')
+    title('Eb/N0 equal to ', Eb_N0_ratios_dB(i))
 end
 
 %%
