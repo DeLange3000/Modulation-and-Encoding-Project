@@ -5,7 +5,7 @@ clear
 %% input parameters
 
 
-Eb_N0_ratios_dB = 10 %0:1:16; % 0:1:0;
+Eb_N0_ratios_dB = 0:1:16; % 0:1:0;
 
 Eb_N0_ratio_dB = 0;
 
@@ -13,7 +13,7 @@ Eb_N0_ratio = 10^(Eb_N0_ratio_dB/10); % noise power Eb/N0
 
 Eb_N0_ratios = 10.^(Eb_N0_ratios_dB/10);
 
-bitstream_length = 2000; %length of bitstream
+bitstream_length = 100*1920; %length of bitstream
 
 % modulations possible (for part 2):
 %   pam 1
@@ -33,7 +33,7 @@ F_carrier = 2e9;
 CFO = ppm*F_carrier; % carrier frequency offset
 phase_offset_degrees  = 0; %[0 1 2 5 10 20 30 45 60]
 phase_offset = phase_offset_degrees/360*2*pi; %between 0 and 2*pi
-sample_time_shift = 0.40*1/Fs; %between zero and 1/Fs = 5e-7
+sample_time_shift = 0*1/Fs; %between zero and 1/Fs = 5e-7
 
 t = 0:1/(upsampling_rate*Fs):((bitstream_length*upsampling_rate - 1)/(upsampling_rate*Fs));
 
@@ -45,12 +45,26 @@ error_factor_K = 0.01;
 % frame sync
 pilot_length = 40;
 pilot = randi(2, pilot_length,1)-1;
-pilot_int = 1000;
+pilot_int = 200;
+
+encoded_pilot = mapping(pilot, number_of_bits, modulation);
 
 
 %% checking compatibility
 if (not(mod(bitstream_length/number_of_bits,1) == 0))
     disp('length of message is incompatible with encoding');
+    return
+end
+if (not(mod(bitstream_length/(pilot_int-pilot_length),1) == 0))
+    disp('length of message is incompatible with encoding (pilot int etc)');
+    return
+end
+if (not(mod(pilot_int/number_of_bits,1) == 0))
+    disp('pilot interval is incompatible with encoding');
+    return
+end
+if (not(mod(pilot_length/number_of_bits,1) == 0))
+    disp('pilot length is incompatible with encoding');
     return
 end
 
@@ -85,13 +99,13 @@ if (isempty(encoded_signal))
     return
 end
 
-figure
-plot(real(encoded_signal), imag(encoded_signal), '*');
-title('Modulated signal')
-xlabel('Real axis')
-ylabel('Imaginairy axis')
-set(gca, 'XAxisLocation', 'origin')
-set(gca, 'YAxisLocation', 'origin')
+% figure
+% plot(real(encoded_signal), imag(encoded_signal), '*');
+% title('Modulated signal')
+% xlabel('Real axis')
+% ylabel('Imaginairy axis')
+% set(gca, 'XAxisLocation', 'origin')
+% set(gca, 'YAxisLocation', 'origin')
 
 %% creating filter
 
@@ -150,6 +164,32 @@ end
 
 tnew = (0:length(filtered_signals_receiver(:, 1))-1)/Fs;
 
+%% frame acq
+
+fprintf("Frame acquisition...\n")
+
+pilot_int_enc = pilot_int/number_of_bits;
+for indddex = 1:length(Eb_N0_ratios)
+fprintf("("+indddex+")\n")
+[argmaxn, cfo_rec] = toa_est(filtered_signals_receiver(:,indddex),encoded_pilot,8,1/2e6)
+%cfo_rec = cfo_est(filtered_signals_receiver(:,indddex), encoded_pilot,0,8,1/Fs)
+filtered_signals_receiver(:, indddex) = filtered_signals_receiver(:, indddex).*exp(-1j*2*pi*cfo_rec*tnew');
+toa_est(filtered_signals_receiver(:,indddex),encoded_pilot,8,1/2e6)
+
+% interp_cfo = [];
+% for i = 1:length(cfo_ests)-1
+% 	range = (1:pilot_int_enc)./(pilot_int_enc);
+% 	interp_range = cfo_ests(i+1)*range + cfo_ests(i)*(1.-range);
+% 	interp_cfo = [interp_cfo interp_range];
+% end
+% lastrange = ((pilot_int_enc+1):(2*pilot_int_enc+mod(length(filtered_signals_receiver(:,indddex)), pilot_int_enc)))/pilot_int_enc;
+% interp_lastrange = cfo_ests(end)*lastrange + cfo_ests(end-1)*(1.-lastrange);
+% interp_cfo = [interp_cfo interp_lastrange];
+
+
+
+end
+toa_est(filtered_signals_receiver(:,1),encoded_pilot,8,1/2e6)
 
 %% decode
 
@@ -163,23 +203,13 @@ end
 
 %% plot garner errors
 
-for i = 1: length(Eb_N0_ratios)
-    figure
-    plot(sample_time_shift + Garner_errors(:,i)/Fs)
-    xlabel('symbols')
-    ylabel('Error of sampling time offset (expressed in symbol periods)')
-    title('Eb/N0 equal to ', Eb_N0_ratios_dB(i))
-end
-
-%%
-
-bigwindow = 1000;
-
-[argmaxn, ~] = toa_est(pilot, decodeds(1:bigwindow,1), 8, 1/2e6);
-
-time_shift = argmaxn;
-begin_of_frame = time_shift+pilot_length
-end_of_frame = begin_of_frame + toa_est(pilot, decodeds(begin_of_frame:begin_of_frame+bigwindow, 1), 8, 1/2e6)
+% for i = 1: length(Eb_N0_ratios)
+%     figure
+%     plot(sample_time_shift + Garner_errors(:,i)/Fs)
+%     xlabel('symbols')
+%     ylabel('Error of sampling time offset (expressed in symbol periods)')
+%     title('Eb/N0 equal to ', Eb_N0_ratios_dB(i))
+% end
 
 %% checking BER
 
