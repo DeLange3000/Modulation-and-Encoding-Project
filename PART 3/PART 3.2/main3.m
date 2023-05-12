@@ -183,7 +183,7 @@ fprintf("Filtering & downsampling...\n")
 end
 
 %legend("K = "+string(error_factors_K(1)),'', '', "K = "+string(error_factors_K(2)),'', '', "K = "+string(error_factors_K(3)),'', '', "K = "+string(error_factors_K(4)),'', '', "K = "+string(error_factors_K(5)),'', '', "K = "+string(error_factors_K(6)))
-legend(string(ppms(1))+" ppm",'', '', string(ppms(2))+" ppm",'', '', string(ppms(3))+" ppm",'', '', string(ppms(4))+" ppm",'', '',string(ppms(5))+" ppm",'', '', string(ppms(6))+" ppm")
+legend(string(ppms(1)*1e6)+" ppm",'', '', string(ppms(2)*1e6)+" ppm",'', '', string(ppms(3)*1e6)+" ppm",'', '', string(ppms(4)*1e6)+" ppm",'', '',string(ppms(5)*1e6)+" ppm",'', '', string(ppms(6)*1e6 )+" ppm")
 %% checking BER
 
 fprintf("Calculating BER...\n")
