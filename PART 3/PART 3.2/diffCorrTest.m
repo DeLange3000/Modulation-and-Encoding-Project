@@ -1,5 +1,5 @@
 a = 2*(randi(2, 1, 10)-1.5);
-y = [2*(randi(2, 1, 100)-1.5) a 2*(randi(2, 1, 500)-1.5)];
+y = [a 2*(randi(2, 1, 500)-1.5)];
 K = length(a)-1;
 %[n, cfo] = toa_est(a, y, K);
 clc
@@ -19,5 +19,4 @@ for i = 1:pilot_int:bitstream_length+pilot_length*ceil(bitstream_length/(pilot_i
 	bitstream = [begin pilot rest]
 end
 
-bitstream_length+pilot_length*ceil(bitstream_length/(pilot_int-pilot_length))
-length(bitstream)
+[n , cfffo] = toa_est(y, a , 10, 1)

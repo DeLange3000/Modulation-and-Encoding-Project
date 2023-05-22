@@ -13,7 +13,7 @@ function [output] = Nyquist_filter(fs, rate, sample_length, beta, taps)
     % inbetween
 	
 	lower = -(taps-1)/2;
-    f_axis = (lower:-lower)*(fs*rate)/(taps);
+    f_axis = (lower:-lower)*(fs*rate)/(taps)/2;
     f_filter_response = zeros(1, length(f_axis));
     for i = 1:length(f_filter_response)
         if abs(f_axis(i)) <= (1-beta)/(2*T)

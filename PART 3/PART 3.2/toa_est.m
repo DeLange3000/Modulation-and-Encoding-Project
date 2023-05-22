@@ -7,9 +7,10 @@ for k = 1:K
 end
 sums(n) = sum;
 end
-figure
-stem(1:(length(y)-length(a)), sums)
-[~, argmaxn] = max(sums);
+% figure
+% stem(1:(length(y)-length(a)), sums)
+[val, argmaxn] = max(sums);
+
 
 cfo = cfo_est(y, a, argmaxn, K, T);
 end
