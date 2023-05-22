@@ -92,7 +92,7 @@ for i = 1:pilot_int:bitstream_length+pilot_length*ceil(bitstream_length/(pilot_i
 	rest = bit_stream(i:end);
 	bit_stream = [begin; pilot; rest];
 end
-bit_stream = [round(rand(100, 1)); bit_stream];
+bit_stream = [round(rand(number_of_bits*round(25*rand()), 1)); bit_stream];
 
 %% encoding
 
