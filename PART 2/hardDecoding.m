@@ -5,7 +5,7 @@ function [dec_bs] = hardDecoding(H, rec_bs, number_of_iterations)
 
     counter = 1;
     for block_i = 1:N:rec_bs_l
-        for a = 1:1 %number_of_iterations
+        for a = 1:number_of_iterations
             block = rec_bs(block_i:block_i+N-1);
     
             v_nodes = zeros(M+1, N);
