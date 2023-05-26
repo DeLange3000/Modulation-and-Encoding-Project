@@ -5,7 +5,7 @@ clear
 %% input parameters
 
 
-Eb_N0_ratios_dB = 0:1:16; % 0:1:0;
+Eb_N0_ratios_dB = 0:1:0; % 0:1:0;
 
 
 Eb_N0_ratio_dB = 0;

@@ -67,14 +67,7 @@ BER_HD_5_iterations = [0.283936718750000
 0
 0];
 
-BER_SD_15_iterations = [0.343340000000000
-0.225310000000000
-0.109590000000000
-0.0301700000000000
-0.00838000000000000
-0.00151000000000000
-0.000370000000000000
-0.000150000000000000];
+BER_SD_15_iterations = [];
 
 BER_HD_1_iteration = [0.283291406250000
 0.214907812500000
@@ -183,32 +176,42 @@ BER_SD_18_iterations = [0.457275781250000
 0
 0];
 
-BER_SD_21_iterations = [];
+BER_SD_21_iterations = [0.458060156250000
+0.456740625000000
+0.454264843750000
+0.305492968750000
+0.0306234375000000
+0.000937500000000000
+4.68750000000000e-06
+0
+0
+0
+0];
 
-BER_pam1_new = [0.213024166666667
-0.157970500000000
-0.103757166666667
-0.0562288333333333
-0.0228336666666667
-0.00592966666666667
-0.000776833333333333
-3.58333333333333e-05
-1.66666666666667e-07
+BER_pam1_new = [0.213264500000000
+0.158431900000000
+0.103771000000000
+0.0563562000000000
+0.0228921000000000
+0.00598820000000000
+0.000784100000000000
+3.40000000000000e-05
+5.00000000000000e-07
 0
 0];
 
 figure
 hold on
-plot(0:5, BER_pam1_new(1:6))
+plot(-5:2:15, BER_pam1_new(1:11))
 % plot(0:10, BER_qam2(1:11))
 % plot(0:10, BER_qam4(1:11))
 % plot(0:10, BER_qam6(1:11))
 %plot(0:5, BER_SD_15_iterations(1:6))
-plot(0:10, BER_HD_1_iteration(1:11))
-plot(0:10, BER_HD_2_iterations(1:11))
-plot(0:10, BER_HD_5_iterations(1:11))
-plot(0:10, BER_HD_7_iterations(1:11))
-plot(0:10, BER_HD_9_iterations(1:11))
+plot(-5:2:15, BER_HD_1_iteration(1:11))
+plot(-5:2:15, BER_HD_2_iterations(1:11))
+plot(-5:2:15, BER_HD_5_iterations(1:11))
+plot(-5:2:15, BER_HD_7_iterations(1:11))
+plot(-5:2:15, BER_HD_9_iterations(1:11))
 set(gca, 'YScale', 'log')
 xlabel('Eb/N0')
 ylabel("BER")
@@ -218,18 +221,18 @@ title('Hard Decoding of pam')
 
 figure
 hold on
-plot(0:5, BER_pam1_new(1:6))
+plot(-5:2:15, BER_pam1_new(1:11))
 % plot(0:10, BER_qam2(1:11))
 % plot(0:10, BER_qam4(1:11))
 % plot(0:10, BER_qam6(1:11))
 %plot(0:5, BER_SD_15_iterations(1:6))
-plot(0:10, BER_SD_1_iteration(1:11))
-plot(0:10, BER_SD_3_iterations(1:11))
-plot(0:10, BER_SD_7_iterations(1:11))
-plot(0:10, BER_SD_11_iterations(1:11))
+plot(-5:2:15, BER_SD_1_iteration(1:11))
+plot(-5:2:15, BER_SD_3_iterations(1:11))
+plot(-5:2:15, BER_SD_7_iterations(1:11))
+plot(-5:2:15, BER_SD_11_iterations(1:11))
 %plot(0:10, BER_SD_15_iterations(1:11))
-plot(0:10, BER_SD_18_iterations(1:11))
-%plot(0:10, BER_SD_21_iterations(1:11))
+plot(-5:2:15, BER_SD_18_iterations(1:11))
+plot(-5:2:15, BER_SD_21_iterations(1:11))
 set(gca, 'YScale', 'log')
 xlabel('Eb/N0')
 ylabel("BER")

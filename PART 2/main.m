@@ -15,11 +15,11 @@ Eb_N0_ratio = 10^(Eb_N0_ratio_dB/10); % noise power Eb/N0
 Eb_N0_ratios = 10.^(Eb_N0_ratios_dB/10);
 
 
-bitstream_length = 1280000; %length of bitstream
+bitstream_length = 12800000; %length of bitstream
 
 % modulations possible (for part 2):
 %   pam 1
-
+  
 modulation = 'pam'; % pam or qam
 number_of_bits = 1; % number of bits per symbol
 
@@ -30,7 +30,7 @@ filter_taps = 101;
 
 % part 2
 number_of_iterations_HD = 1;
-number_of_iterations_SD = 21;
+number_of_iterations_SD = 15;
 size_LDPC = 128;
 
 H = generate_ldpc(size_LDPC, 2*size_LDPC, 0, 1, 2);

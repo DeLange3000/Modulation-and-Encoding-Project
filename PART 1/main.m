@@ -14,7 +14,7 @@ Eb_N0_ratio = 10^(Eb_N0_ratio_dB/10); % noise power Eb/N0
 
 Eb_N0_ratios = 10.^(Eb_N0_ratios_dB/10);
 
-bitstream_length = 1000000*6; %length of bitstream
+bitstream_length = 10000000; %length of bitstream
 
 % modulations possible:
 %   pam 1
