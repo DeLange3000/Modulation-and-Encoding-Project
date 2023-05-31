@@ -5,7 +5,7 @@ clear
 %% input parameters
 
 
-Eb_N0_ratios_dB = 0:0.2:20; % 0:1:0;
+Eb_N0_ratios_dB = 60%0:1:20;
 
 Eb_N0_ratio_dB = 0;
 
@@ -14,7 +14,7 @@ Eb_N0_ratio = 10^(Eb_N0_ratio_dB/10); % noise power Eb/N0
 Eb_N0_ratios = 10.^(Eb_N0_ratios_dB/10);
 
 
-bitstream_length = 100*1920; %length of bitstream
+bitstream_length = 4*3200; %length of bitstream
 
 % modulations possible (for part 2):
 %   pam 1
@@ -30,11 +30,11 @@ filter_taps = 10*upsampling_rate+1;
 % part 3
 
 %ppms = [0 1 2 10 20 50]*1e-6;
-ppm = 1*1e-6;
+ppm = 10*1e-6;
 F_carrier = 2e9;
 CFO = ppm*F_carrier; % carrier frequency offset
 %CFOs = ppms.*F_carrier;
-phase_offset_degrees  = 10; %[0 1 2 5 10 20 30 45 60]
+phase_offset_degrees  = 0; %[0 1 2 5 10 20 30 45 60]
 phase_offset = phase_offset_degrees/360*2*pi; %between 0 and 2*pi
 sample_time_shift = 0*1/Fs; %between zero and 1/Fs = 5e-7
 
@@ -49,6 +49,7 @@ coulors = ["blue", "red", "green", "black", "cyan", "magenta"];
 averaging_length = 10;
 
 % frame sync
+K = 16;
 pilot_length = 40*number_of_bits;
 pilot = randi(2, pilot_length,1)-1;
 pilot_int = 840*number_of_bits;
@@ -105,13 +106,13 @@ if (isempty(encoded_signal))
     return
 end
 
-% figure
-% plot(real(encoded_signal), imag(encoded_signal), '*');
-% title('Modulated signal')
-% xlabel('Real axis')
-% ylabel('Imaginairy axis')
-% set(gca, 'XAxisLocation', 'origin')
-% set(gca, 'YAxisLocation', 'origin')
+%figure
+plot(real(encoded_signal), imag(encoded_signal), '*');
+title('Modulated signal')
+xlabel('Re')
+ylabel('Im')
+set(gca, 'XAxisLocation', 'origin')
+set(gca, 'YAxisLocation', 'origin')
 
 %% creating filter
 
@@ -200,16 +201,17 @@ tnew = (0:length(filtered_signals_receiver(:, 1))-1)/Fs;
 fprintf("Frame acquisition...\n")
 
 pilot_int_enc = pilot_int/number_of_bits;
+cfo_rec = zeros(1,length(Eb_N0_ratios));
 for indddex = 1:length(Eb_N0_ratios)
 fprintf("("+indddex+")\n")
-[argmaxn, cfo_rec] = toa_est(filtered_signals_receiver(1:pilot_int_enc,indddex),encoded_pilot,20,1/2e6);
-cfo_recs = [];
-for start = 1:pilot_int_enc:length(filtered_signals_receiver)-pilot_int_enc
-	frame = filtered_signals_receiver(start+1:start+pilot_int_enc, indddex);
-	cfo_recs = [cfo_recs cfo_est(filtered_signals_receiver(start:start+pilot_int_enc, indddex), encoded_pilot, argmaxn, 20, 1/2e6)];
-end
-cfo_rec = mean(cfo_recs);
-filtered_signals_receiver(:, indddex) = filtered_signals_receiver(:, indddex).*exp(-1j*2*pi*cfo_rec*tnew');
+[argmaxn, cfo_rec(indddex)] = toa_est(filtered_signals_receiver(1:pilot_int_enc,indddex),encoded_pilot,K,1/2e6);
+% cfo_recs = [];
+% for start = 1:pilot_int_enc:length(filtered_signals_receiver)-pilot_int_enc
+% 	frame = filtered_signals_receiver(start+1:start+pilot_int_enc, indddex);
+% 	cfo_recs = [cfo_recs cfo_est(filtered_signals_receiver(start:start+pilot_int_enc, indddex), encoded_pilot, argmaxn, K, 1/2e6)];
+% end
+% cfo_rec = mean(cfo_recs);
+filtered_signals_receiver(:, indddex) = filtered_signals_receiver(:, indddex).*exp(-1j*2*pi*cfo_rec(indddex)*tnew');
 
 % recover angles
 angle_ests = [];
@@ -218,10 +220,10 @@ for pilot_start = argmaxn:pilot_int_enc:length(filtered_signals_receiver)-pilot_
 	angle_ests = [angle_ests median(angle(pilot_rec./encoded_pilot))];
 end
 
-% figure
-% plot(angle_ests, "*")
-% hold on
-% title("SNR [dB]: ", Eb_N0_ratios_dB(indddex))
+figure
+plot(angle_ests, "*")
+hold on
+title("SNR [dB]: ", Eb_N0_ratios_dB(indddex))
 
 
 legacy_angles = [angle_ests(1) angle_ests(2)];
@@ -236,9 +238,9 @@ for i = 1:length(angle_ests)-1
 	filtered_signals_receiver(replace_range, indddex) = filtered_signals_receiver(replace_range, indddex).*(exp(1).^(-1i*interp_range'));
 	
 	pilot_rec = filtered_signals_receiver(range_start+pilot_int_enc:range_start+pilot_int_enc+pilot_length/number_of_bits-1, indddex);
-	angle_ests(i+1) = 0;
-	angle_ests(i+2) = mean(angle(pilot_rec./encoded_pilot));
-	legacy_angles(i+2) = angle_ests(i+2);
+	% angle_ests(i+1) = 0;
+	% angle_ests(i+2) = mean(angle(pilot_rec./encoded_pilot));
+	% legacy_angles(i+2) = angle_ests(i+2);
 
 % 	range = (1:pilot_int_enc)./(pilot_int_enc);
 % 	if abs(angle_ests(i+1)-angle_ests(i)) < pi/2
@@ -256,9 +258,10 @@ interp_lastrange = angle_ests(end)*lastrange + angle_ests(end-1)*(1.-lastrange);
 % plot(interp_angles)
 
 filtered_signals_receiver(end-length(lastrange)+1:end, indddex) = filtered_signals_receiver(end-length(lastrange)+1:end, indddex).*(exp(1).^(-1i*interp_lastrange'));
-%plot(legacy_angles)
+plot(legacy_angles)
 
 end
+
 
 
     %% decode
@@ -314,15 +317,15 @@ for i = 1:length(Eb_N0_ratios)
 end
 
 figure
-semilogy(10*log10(Eb_N0_ratios), BERs)
+% semilogy(10*log10(Eb_N0_ratios), BERs)
 hold on
 xlabel("Eb/N0 [dB]")
 ylabel("BER")
 legend("CFO = 1 ppm", "10 ppm")
 
-BERS10ppm = [ 0.168164058626366; 0.194368417921104; 0.146218837389183; 0.144111580492255; 0.137601396243629; 0.164856904861070; 0.141052339303068; 0.147587314809306; 0.189881200293528; 0.166661708415145; 0.130649927609528; 0.102566390987882; 0.133163761131275; 0.123688542472383; 0.0951835544713512; 0.116122250649531; 0.110757422502529; 0.0912367862596934; 0.142257194422959; 0.122870430971222; 0.0879643402550525; 0.0812459094424942; 0.0828771741932925; 0.0715277364590151; 0.0703476725967355; 0.0832887090696337; 0.0678040895658555; 0.0530037087721386; 0.0349903809920470; 0.0552696297177763; 0.0428442514031852; 0.0451002558457785; 0.0305229963705599; 0.0318022252632832; 0.0270770115626426; 0.0281628686460007; 0.0418129350865711; 0.0436127803891236; 0.0178149977192043; 0.0145921342297852; 0.0129807024850757; 0.0190644771027945; 0.0115378512921203; 0.0168828464330339; 0.0179092044981258; 0.00748695979849666; 0.00968346522282382; 0.0237351500366911; 0.00445250986692053; 0.00751670930762976; 0.0100355010808988; 0.0163622300232046; 0.00211221514845005; 0.00162630649927610; 0.00247912576109161; 0.00597965133575296; 0.00399139247535749; 0.00261299855219056; 0.00162134824775391; 0.000237996073064794; 0.00156680748100990; 0.000153705797187680; 0.000143789294143313; 0.000178497054798596; 8.92485273992979e-05; 7.43737728327483e-05; 0.000456159140040856; 0.000267745582197894; 8.42902758771147e-05; 0; 0; 2.97495091330993e-05; 2.97495091330993e-05; 9.91650304436643e-06; 7.43737728327483e-05; 2.47912576109161e-05; 4.95825152218322e-06; 9.91650304436643e-06; 9.91650304436643e-06; 4.95825152218322e-06; 0; 0; 0; 4.95825152218322e-06; 0; 4.95825152218322e-06; 0; 0; 0; 0; 0; 0; 0; 4.95825152218322e-06; 0; 4.95825152218322e-06; 0; 0; 0; 0; 0];
-semilogy(10*log10(Eb_N0_ratios), BERS10ppm)
+% BERS10ppm = [ 0.168164058626366; 0.194368417921104; 0.146218837389183; 0.144111580492255; 0.137601396243629; 0.164856904861070; 0.141052339303068; 0.147587314809306; 0.189881200293528; 0.166661708415145; 0.130649927609528; 0.102566390987882; 0.133163761131275; 0.123688542472383; 0.0951835544713512; 0.116122250649531; 0.110757422502529; 0.0912367862596934; 0.142257194422959; 0.122870430971222; 0.0879643402550525; 0.0812459094424942; 0.0828771741932925; 0.0715277364590151; 0.0703476725967355; 0.0832887090696337; 0.0678040895658555; 0.0530037087721386; 0.0349903809920470; 0.0552696297177763; 0.0428442514031852; 0.0451002558457785; 0.0305229963705599; 0.0318022252632832; 0.0270770115626426; 0.0281628686460007; 0.0418129350865711; 0.0436127803891236; 0.0178149977192043; 0.0145921342297852; 0.0129807024850757; 0.0190644771027945; 0.0115378512921203; 0.0168828464330339; 0.0179092044981258; 0.00748695979849666; 0.00968346522282382; 0.0237351500366911; 0.00445250986692053; 0.00751670930762976; 0.0100355010808988; 0.0163622300232046; 0.00211221514845005; 0.00162630649927610; 0.00247912576109161; 0.00597965133575296; 0.00399139247535749; 0.00261299855219056; 0.00162134824775391; 0.000237996073064794; 0.00156680748100990; 0.000153705797187680; 0.000143789294143313; 0.000178497054798596; 8.92485273992979e-05; 7.43737728327483e-05; 0.000456159140040856; 0.000267745582197894; 8.42902758771147e-05; 0; 0; 2.97495091330993e-05; 2.97495091330993e-05; 9.91650304436643e-06; 7.43737728327483e-05; 2.47912576109161e-05; 4.95825152218322e-06; 9.91650304436643e-06; 9.91650304436643e-06; 4.95825152218322e-06; 0; 0; 0; 4.95825152218322e-06; 0; 4.95825152218322e-06; 0; 0; 0; 0; 0; 0; 0; 4.95825152218322e-06; 0; 4.95825152218322e-06; 0; 0; 0; 0; 0];
+% semilogy(10*log10(10.^((0:0.2:20)/10)), BERS10ppm)
 
-%% plot BER
+%% plot
 
-
+freq_err_ppm_N40_K16 = abs(CFO-cfo_rec)*1e6/F_carrier;
